@@ -1,5 +1,7 @@
 ﻿using System.Windows;
 
+using AttendanceWorks.Admin;
+
 namespace AttendanceWorks;
 
 /// <summary>
@@ -7,8 +9,12 @@ namespace AttendanceWorks;
 /// </summary>
 public partial class Dashboard : Window
 {
-	public Dashboard(LoginWindow loginWindow) =>
+	private TeacherModel _teacher;
+	public Dashboard(TeacherModel teacher)
+	{
 		InitializeComponent();
+		_teacher = teacher;
+	}
 
 	private void btnStudent_Click(object sender, RoutedEventArgs e)
 	{
@@ -22,6 +28,7 @@ public partial class Dashboard : Window
 
 	private void btnAdmin_Click(object sender, RoutedEventArgs e)
 	{
-
+		AdminPanel adminPanel = new();
+		adminPanel.Show();
 	}
 }

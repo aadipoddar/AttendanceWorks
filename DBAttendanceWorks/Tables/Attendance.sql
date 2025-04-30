@@ -8,6 +8,5 @@
     [MarkedBy] INT NULL, -- Teacher ID who marked attendance
     CONSTRAINT [FK_Attendance_ScheduledClass] FOREIGN KEY ([ScheduledClassId]) REFERENCES [ScheduledClass]([Id]),
     CONSTRAINT [FK_Attendance_Student] FOREIGN KEY ([StudentId]) REFERENCES [Student]([Id]),
-    CONSTRAINT [FK_Attendance_Teacher] FOREIGN KEY ([MarkedBy]) REFERENCES [Teacher]([Id]),
-    CONSTRAINT [UQ_Attendance] UNIQUE ([ScheduledClassId], [StudentId])
+    CONSTRAINT [FK_Attendance_Teacher] FOREIGN KEY ([MarkedBy]) REFERENCES [Teacher]([Id])
 )

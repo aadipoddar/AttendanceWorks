@@ -87,7 +87,7 @@
     <Build Include="StoredProcedure\Insert\Insert_Course.sql" />
     <Build Include="StoredProcedure\Insert\Insert_CourseSection.sql" />
     <Build Include="StoredProcedure\Insert\Insert_Section.sql" />
-    <Build Include="StoredProcedure\Insert\Insert_SeectionStudent.sql" />
+    <Build Include="StoredProcedure\Insert\Insert_SectionStudent.sql" />
     <Build Include="StoredProcedure\Insert\Insert_ScheduledClass.sql" />
     <Build Include="StoredProcedure\Insert\Insert_Attendance.sql" />
   </ItemGroup>

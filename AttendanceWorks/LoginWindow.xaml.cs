@@ -18,19 +18,9 @@ public partial class LoginWindow : Window
 		var teacher = await TeacherData.LoadTeacherByEmailPassword(emailTextBox.Text, passwordBox.Password);
 		if (teacher is not null)
 		{
-			Dashboard dashboard = new(this);
+			Dashboard dashboard = new(teacher);
 			dashboard.Show();
-			Hide();
-
-			return;
-		}
-
-		var student = await StudentData.LoadStudentByEmailPassword(emailTextBox.Text, passwordBox.Password);
-		if (student is not null)
-		{
-			Dashboard studentDashboard = new(this);
-			studentDashboard.Show();
-			Hide();
+			Close();
 
 			return;
 		}

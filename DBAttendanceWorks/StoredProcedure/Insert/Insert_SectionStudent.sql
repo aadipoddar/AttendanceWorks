@@ -1,4 +1,4 @@
-﻿CREATE PROCEDURE [dbo].[Insert_SeectionStudent]
+﻿CREATE PROCEDURE [dbo].[Insert_SectionStudent]
 	@Id INT,
 	@SectionId INT,
 	@StudentId INT,

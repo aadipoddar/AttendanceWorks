@@ -7,4 +7,11 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="Phone" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="46838fa0-8104-4b38-ba8f-2818f53294aa" ChangeDateTime="04/30/2025 19:21:00">
+    <Property Name="ElementName" Value="[dbo].[Insert_SeectionStudent]" />
+    <Property Name="ElementType" Value="SqlProcedure" />
+    <Property Name="ParentElementName" Value="[dbo]" />
+    <Property Name="ParentElementType" Value="SqlSchema" />
+    <Property Name="NewName" Value="[Insert_SectionStudent]" />
+  </Operation>
 </Operations>
