@@ -1,0 +1,6 @@
+﻿CREATE TABLE [dbo].[Section]
+(
+	[Id] INT NOT NULL PRIMARY KEY IDENTITY, 
+    [Name] VARCHAR(20) NOT NULL, 
+    [Status] BIT NOT NULL DEFAULT 1
+)

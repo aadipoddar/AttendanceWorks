@@ -1,0 +1,8 @@
+﻿CREATE TABLE [dbo].[ClassRoom]
+(
+	[Id] INT NOT NULL PRIMARY KEY IDENTITY, 
+    [Name] VARCHAR(10) NOT NULL, 
+    [Latitude] DECIMAL(10, 5) NOT NULL DEFAULT 0, 
+    [Longitude] DECIMAL(10, 5) NOT NULL DEFAULT 0,
+    [Status] BIT NOT NULL DEFAULT 1
+)

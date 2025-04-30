@@ -1,0 +1,8 @@
+﻿CREATE TABLE [dbo].[Course]
+(
+    [Id] INT NOT NULL PRIMARY KEY IDENTITY,
+    [Code] VARCHAR(20) NOT NULL UNIQUE,
+    [Name] VARCHAR(100) NOT NULL,
+    [Credits] INT NOT NULL,
+    [Status] BIT NOT NULL DEFAULT 1
+)
