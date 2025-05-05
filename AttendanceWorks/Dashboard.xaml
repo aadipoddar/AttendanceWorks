@@ -15,7 +15,7 @@
 		</Grid.RowDefinitions>
 
 		<Button x:Name="btnStudent" Content="Student" MinWidth="100" MinHeight="40" Margin="10" Padding="5" Click="btnStudent_Click"/>
-		<Button x:Name="btnTeacher" Grid.Row="1" Content="Teacher" MinWidth="100" MinHeight="40" Margin="10" Padding="5" Click="btnTeacher_Click"/>
+		<Button x:Name="btnMarkAttendacne" Grid.Row="1" Content="Mark Attendance" MinWidth="100" MinHeight="40" Margin="10" Padding="5" Click="btnMarkAttendacne_Click"/>
 		<Button x:Name="btnAdmin" Grid.Row="2" Content="Admin" MinWidth="100" MinHeight="40" Margin="10" Padding="5" Click="btnAdmin_Click"/>
 	</Grid>
 	

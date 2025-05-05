@@ -55,8 +55,8 @@ public partial class ScheduledClassPage : Page
 			Id = (scheduledClassDataGrid.SelectedItem as ScheduledClassModel)?.Id ?? 0,
 			CourseSectionId = (int)courseSectionComboBox.SelectedValue,
 			ClassDate = DateOnly.FromDateTime(classDatePicker.SelectedDate.Value),
-			StartTime = int.Parse(startTimeTextBox.Text),
-			EndTime = int.Parse(endTimeTextBox.Text),
+			StartTime = new TimeOnly(int.Parse(startTimeTextBox.Text), 0),
+			EndTime = new TimeOnly(int.Parse(endTimeTextBox.Text), 0),
 			Status = statusCheckBox.IsChecked ?? false
 		});
 

@@ -9,7 +9,8 @@ public partial class LoginWindow : Window
 {
 	public LoginWindow()
 	{
-		Dapper.SqlMapper.AddTypeHandler(new DateOnlyTypeHandler());
+		Dapper.SqlMapper.AddTypeHandler(new SqlDateOnlyTypeHandler());
+		Dapper.SqlMapper.AddTypeHandler(new SqlTimeOnlyTypeHandler());
 		InitializeComponent();
 	}
 

@@ -1,5 +1,4 @@
 ﻿using System.Data;
-using System.Diagnostics.CodeAnalysis;
 
 using Dapper;
 
@@ -27,18 +26,19 @@ public static class SqlDataAccess
 	}
 }
 
-public class DateOnlyTypeHandler : SqlMapper.TypeHandler<DateOnly>
+public class SqlDateOnlyTypeHandler : SqlMapper.TypeHandler<DateOnly>
 {
-	public override DateOnly Parse(object value)
+	public override void SetValue(IDbDataParameter parameter, DateOnly date)
+		=> parameter.Value = date.ToDateTime(new TimeOnly(0, 0));
+	public override DateOnly Parse(object value) => DateOnly.FromDateTime((DateTime)value);
+}
+
+public class SqlTimeOnlyTypeHandler : SqlMapper.TypeHandler<TimeOnly>
+{
+	public override void SetValue(IDbDataParameter parameter, TimeOnly time)
 	{
-		return value is DateOnly dateOnly
-			? dateOnly
-			: DateOnly.FromDateTime((DateTime)value);
+		parameter.Value = time.ToString();
 	}
 
-	public override void SetValue([DisallowNull] IDbDataParameter parameter, DateOnly value)
-	{
-		parameter.Value = value.ToDateTime(TimeOnly.MinValue);
-		parameter.DbType = DbType.Date;
-	}
+	public override TimeOnly Parse(object value) => TimeOnly.FromTimeSpan((TimeSpan)value);
 }
