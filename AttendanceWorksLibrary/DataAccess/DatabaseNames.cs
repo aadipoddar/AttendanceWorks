@@ -20,7 +20,8 @@ public static class StoredProcedureNames
 	public static string LoadTableDataByStatus => "Load_TableData_By_Status";
 
 	public static string LoadTeacherByEmailPassword => "Load_Teacher_By_Email_Password";
-	public static string LoadStudentByEmailPassword => "Load_Student_By_Email_Password";
+	public static string LoadStudentByEmail => "Load_Student_By_Email";
+	public static string LoadStudentByRoll => "Load_Student_By_Roll";
 	public static string LoadStudentBySection => "Load_Student_By_Section";
 
 	public static string LoadAttendanceByScheduledClass => "Load_Attendance_By_ScheduledClass";

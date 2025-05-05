@@ -1,0 +1,139 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="AttendanceWorksMaui.MainPage"
+             Title="Attendance Works">
+
+    <Grid RowDefinitions="Auto, *, Auto">
+        <!-- Header Section -->
+        <VerticalStackLayout Grid.Row="0" Padding="20,30,20,10">
+            <Label x:Name="WelcomeLabel" 
+                   Text="Hello, Student" 
+                   FontSize="24" 
+                   FontAttributes="Bold"/>
+            <Label x:Name="DateLabel" 
+                   Text="May 5, 2025" 
+                   FontSize="16" 
+                   TextColor="#666666"/>
+        </VerticalStackLayout>
+
+        <!-- Main Content -->
+        <ScrollView Grid.Row="1" Padding="20,0,20,0">
+            <VerticalStackLayout Spacing="20">
+                <!-- Current Class Card -->
+                <Border Stroke="#dddddd"
+                        StrokeThickness="1"
+                        StrokeShape="RoundRectangle 10"
+                        BackgroundColor="White"
+                        Padding="15">
+                    <VerticalStackLayout>
+                        <Label Text="CURRENT CLASS" 
+                               FontSize="14" 
+                               TextColor="#666666"/>
+                        <Label x:Name="CurrentClassLabel" 
+                               Text="No active class" 
+                               FontSize="20" 
+                               FontAttributes="Bold" 
+                               Margin="0,5,0,5"/>
+                        <Grid ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto">
+                            <Label Grid.Column="0" Grid.Row="0" 
+                                   Text="Time:" 
+                                   FontAttributes="Bold"
+                                   TextColor="#666666"/>
+                            <Label Grid.Column="1" Grid.Row="0" 
+                                   x:Name="ClassTimeLabel" 
+                                   Text="N/A" 
+                                   TextColor="#666666"/>
+                            
+                            <Label Grid.Column="0" Grid.Row="1" 
+                                   Text="Room:" 
+                                   FontAttributes="Bold"
+                                   TextColor="#666666"/>
+                            <Label Grid.Column="1" Grid.Row="1" 
+                                   x:Name="ClassRoomLabel" 
+                                   Text="N/A" 
+                                   TextColor="#666666"/>
+                            
+                            <Label Grid.Column="2" Grid.RowSpan="2" 
+                                   x:Name="StatusLabel" 
+                                   Text="INACTIVE" 
+                                   TextColor="#ff6b6b"
+                                   FontAttributes="Bold"
+                                   VerticalOptions="Center"
+                                   HorizontalOptions="End"/>
+                        </Grid>
+                    </VerticalStackLayout>
+                </Border>
+                
+                <!-- Location Info Card -->
+                <Border Stroke="#dddddd"
+                        StrokeThickness="1"
+                        StrokeShape="RoundRectangle 10"
+                        BackgroundColor="White"
+                        Padding="15">
+                    <VerticalStackLayout>
+                        <Label Text="YOUR LOCATION" 
+                               FontSize="14" 
+                               TextColor="#666666"/>
+                        <Grid ColumnDefinitions="*,*" Margin="0,10,0,0">
+                            <Label Grid.Column="0" 
+                                   Text="Current:" 
+                                   FontAttributes="Bold"
+                                   TextColor="#666666"/>
+                            <Label Grid.Column="1" 
+                                   x:Name="LocationStatusLabel" 
+                                   Text="Checking..." 
+                                   TextColor="#666666"/>
+                        </Grid>
+                        <Label x:Name="LocationInfoLabel" 
+                               Text="Location services must be enabled to mark attendance" 
+                               TextColor="#666666"
+                               Margin="0,10,0,0"/>
+                    </VerticalStackLayout>
+                </Border>
+                
+                <!-- Attendance Status Card -->
+                <Border Stroke="#dddddd"
+                        StrokeThickness="1"
+                        StrokeShape="RoundRectangle 10"
+                        BackgroundColor="White"
+                        Padding="15">
+                    <VerticalStackLayout>
+                        <Label Text="ATTENDANCE STATUS" 
+                               FontSize="14" 
+                               TextColor="#666666"/>
+                        <Label x:Name="AttendanceStatusLabel" 
+                               Text="Not marked" 
+                               FontSize="20" 
+                               FontAttributes="Bold" 
+                               TextColor="#ff9900"
+                               Margin="0,5,0,5"/>
+                    </VerticalStackLayout>
+                </Border>
+            </VerticalStackLayout>
+        </ScrollView>
+        
+        <!-- Footer with Actions -->
+        <VerticalStackLayout Grid.Row="2" Padding="20,10,20,30" Spacing="10">
+            <Button x:Name="MarkAttendanceButton" 
+                    Text="Mark My Attendance" 
+                    BackgroundColor="#4CAF50" 
+                    TextColor="White"
+                    FontAttributes="Bold"
+                    HeightRequest="50"
+                    CornerRadius="25"
+                    Clicked="MarkAttendanceButton_Clicked"/>
+            
+            <Button x:Name="RefreshButton" 
+                    Text="Refresh Class Info" 
+                    BackgroundColor="Transparent" 
+                    TextColor="#007bff"
+                    FontAttributes="Bold"
+                    BorderColor="#007bff"
+                    BorderWidth="1"
+                    HeightRequest="50"
+                    CornerRadius="25"
+                    Clicked="RefreshButton_Clicked"/>
+        </VerticalStackLayout>
+    </Grid>
+</ContentPage>
