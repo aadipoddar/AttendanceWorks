@@ -9,6 +9,27 @@
                 <ResourceDictionary Source="Resources/Styles/Colors.xaml" />
                 <ResourceDictionary Source="Resources/Styles/Styles.xaml" />
             </ResourceDictionary.MergedDictionaries>
+
+            <local:BoolToStatusConverter x:Key="BoolToStatusConverter" />
+            <local:BoolToColorConverter x:Key="BoolToColorConverter" />
+            <local:BoolToStyleConverter x:Key="BoolToStyleConverter" />
+            
+            <!-- Status Badge Styles -->
+            <Style x:Key="PresentBadgeStyle" TargetType="Border">
+                <Setter Property="BackgroundColor" Value="#e7f5e9"/>
+                <Setter Property="StrokeShape" Value="RoundRectangle 12"/>
+                <Setter Property="Padding" Value="10,5"/>
+                <Setter Property="WidthRequest" Value="90"/>
+                <Setter Property="HorizontalOptions" Value="Center"/>
+            </Style>
+            
+            <Style x:Key="AbsentBadgeStyle" TargetType="Border">
+                <Setter Property="BackgroundColor" Value="#ffebee"/>
+                <Setter Property="StrokeShape" Value="RoundRectangle 12"/>
+                <Setter Property="Padding" Value="10,5"/>
+                <Setter Property="WidthRequest" Value="90"/>
+                <Setter Property="HorizontalOptions" Value="Center"/>
+            </Style>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

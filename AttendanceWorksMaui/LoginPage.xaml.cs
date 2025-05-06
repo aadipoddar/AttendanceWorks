@@ -87,6 +87,9 @@ public partial class LoginPage : ContentPage
 				SecureStorage.Remove("password");
 			}
 
+			passwordEntry.Text = "";
+			emailEntry.Text = "";
+
 			await Navigation.PushAsync(new MainPage(student));
 		}
 
@@ -148,5 +151,11 @@ public partial class LoginPage : ContentPage
 		Mailing.MailPassword(student.Email, student.Password);
 
 		await DisplayAlert("Password Mailed", "Your Password has been mailed to you to your Email Address", "OK");
+	}
+
+	private void TogglePasswordVisibility(object sender, EventArgs e)
+	{
+		passwordEntry.IsPassword = !passwordEntry.IsPassword;
+		((ImageButton)sender).Source = passwordEntry.IsPassword ? "view.png" : "hide.png";
 	}
 }

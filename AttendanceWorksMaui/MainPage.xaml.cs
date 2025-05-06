@@ -28,6 +28,7 @@ public partial class MainPage : ContentPage
 
 		// Check for active classes
 		await RefreshClassInfo();
+		await RefreshStudentAttendance();
 
 		// Check location permissions
 		await CheckLocationPermission();
@@ -69,6 +70,24 @@ public partial class MainPage : ContentPage
 
 		// Check if attendance is already marked
 		await CheckAttendanceStatus();
+	}
+
+	private async Task RefreshStudentAttendance()
+	{
+		var studentAttendance = await StudentData.LoadStudentAttendance(_student.Id);
+		if (studentAttendance is not null)
+		{
+			var presentPercentage = (double)studentAttendance.Count(a => a.Present) / studentAttendance.Count * 100;
+			var absentPercentage = (double)studentAttendance.Count(a => !a.Present) / studentAttendance.Count * 100;
+
+			var lateCount = studentAttendance.Count(a =>
+				(a.EntryTime.TimeOfDay - a.StartTime.ToTimeSpan()).TotalMinutes > 5);
+			var latePercentage = (double)lateCount / studentAttendance.Count * 100;
+
+			presentPercentLabel.Text = $"{presentPercentage:F2}%";
+			absentPercentLabel.Text = $"{absentPercentage:F2}%";
+			latePercentLabel.Text = $"{latePercentage:F2}%";
+		}
 	}
 
 	private async Task CheckAttendanceStatus()
@@ -172,12 +191,14 @@ public partial class MainPage : ContentPage
 						LocationInfoLabel.Text = "You are within class location range";
 						MarkAttendanceButton.IsEnabled = true && !_isAttendanceMarked;
 						await MarkAttendance();
+						NavigateToClassButton.IsVisible = false;
 					}
 					else
 					{
 						LocationInfoLabel.Text = "You are not in the classroom location";
 						MarkAttendanceButton.IsEnabled = false;
 						await MarkAbsent();
+						NavigateToClassButton.IsVisible = true;
 					}
 				}
 				else
@@ -282,6 +303,9 @@ public partial class MainPage : ContentPage
 
 	private async Task MarkAbsent()
 	{
+		if (_currentClass is null)
+			return;
+
 		var existingAttendance = await AttendanceData.LoadAttendanceByScheduledClass(_currentClass.ScheduledClassId);
 		var attendanceRecord = existingAttendance.FirstOrDefault(a => a.StudentId == _student.Id && a.MarkedBy is null);
 		if (attendanceRecord is not null)
@@ -301,7 +325,7 @@ public partial class MainPage : ContentPage
 		}
 	}
 
-	public async Task<bool> CheckMock()
+	public static async Task<bool> CheckMock()
 	{
 		var request = new GeolocationRequest(GeolocationAccuracy.Best);
 		var location = await Geolocation.GetLocationAsync(request);
@@ -310,5 +334,23 @@ public partial class MainPage : ContentPage
 			return true;
 
 		return false;
+	}
+
+	private void NavigateToClassButton_Clicked(object sender, EventArgs e)
+	{
+
+	}
+
+	private async void LogoutButton_Clicked(object sender, EventArgs e)
+	{
+		SecureStorage.Remove("email");
+		SecureStorage.Remove("password");
+
+		await Navigation.PopAsync();
+	}
+
+	private void ViewHistoryButton_Clicked(object sender, EventArgs e)
+	{
+		Navigation.PushAsync(new AttendanceReportWindow(_student));
 	}
 }

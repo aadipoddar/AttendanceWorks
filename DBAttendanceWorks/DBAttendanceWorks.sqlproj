@@ -94,6 +94,8 @@
     <Build Include="StoredProcedure\LoadData\Student\Load_Student_By_Section.sql" />
     <Build Include="StoredProcedure\LoadData\Attendance\Load_Attendance_By_ScheduledClass.sql" />
     <Build Include="StoredProcedure\LoadData\Student\Load_Student_By_Roll.sql" />
+    <Build Include="StoredProcedure\LoadData\Student\Load_Student_Attendance.sql" />
+    <Build Include="Views\View_AttendanceDetails.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="DBAttendanceWorks.refactorlog" />

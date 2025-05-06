@@ -13,4 +13,7 @@ public static class StudentData
 
 	public static async Task<List<StudentModel>> LoadStudentBySection(int SectionId) =>
 		await SqlDataAccess.LoadData<StudentModel, dynamic>(StoredProcedureNames.LoadStudentBySection, new { SectionId });
+
+	public static async Task<List<AttendanceDetailModel>> LoadStudentAttendance(int StudentId) =>
+		await SqlDataAccess.LoadData<AttendanceDetailModel, dynamic>(StoredProcedureNames.LoadStudentAttendance, new { StudentId });
 }

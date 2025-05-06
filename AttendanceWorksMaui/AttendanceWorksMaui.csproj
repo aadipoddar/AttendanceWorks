@@ -92,6 +92,25 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <None Remove="Resources\Icons\attendance.png" />
+	  <None Remove="Resources\Icons\back.png" />
+	  <None Remove="Resources\Icons\hide.png" />
+	  <None Remove="Resources\Icons\lock.png" />
+	  <None Remove="Resources\Icons\user.png" />
+	  <None Remove="Resources\Icons\view.png" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <MauiImage Include="Resources\Icons\attendance.png" />
+	  <MauiImage Include="Resources\Icons\back.png" />
+	  <MauiImage Include="Resources\Icons\hide.png" />
+	  <MauiImage Include="Resources\Icons\lock.png" />
+	  <MauiImage Include="Resources\Icons\no_data.png" />
+	  <MauiImage Include="Resources\Icons\user.png" />
+	  <MauiImage Include="Resources\Icons\view.png" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
 		<PackageReference Include="Microsoft.Maui.Controls" Version="9.0.60" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.4" />
@@ -102,6 +121,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <MauiXaml Update="AttendanceReportWindow.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="LoginPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>

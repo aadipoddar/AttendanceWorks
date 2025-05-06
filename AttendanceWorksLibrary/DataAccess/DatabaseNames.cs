@@ -22,6 +22,7 @@ public static class StoredProcedureNames
 	public static string LoadStudentByEmail => "Load_Student_By_Email";
 	public static string LoadStudentByRoll => "Load_Student_By_Roll";
 	public static string LoadStudentBySection => "Load_Student_By_Section";
+	public static string LoadStudentAttendance => "Load_Student_Attendance";
 
 	public static string LoadAttendanceByScheduledClass => "Load_Attendance_By_ScheduledClass";
 
@@ -38,4 +39,5 @@ public static class StoredProcedureNames
 public static class ViewNames
 {
 	public static string ViewActiveClasses => "View_ActiveClasses";
+	public static string ViewAttendanceDetails => "View_AttendanceDetails";
 }
