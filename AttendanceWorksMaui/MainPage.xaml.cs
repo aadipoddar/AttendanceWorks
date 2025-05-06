@@ -83,12 +83,12 @@ public partial class MainPage : ContentPage
 		var existingAttendance = await AttendanceData.LoadAttendanceByScheduledClass(_currentClass.ScheduledClassId);
 		var attendanceRecord = existingAttendance.FirstOrDefault(a => a.StudentId == _student.Id);
 
-		_isAttendanceMarked = attendanceRecord is not null && attendanceRecord.Present;
+		_isAttendanceMarked = attendanceRecord is not null;
 
 		if (_isAttendanceMarked)
 		{
-			AttendanceStatusLabel.Text = "Marked Present";
-			AttendanceStatusLabel.TextColor = Colors.Green;
+			AttendanceStatusLabel.Text = attendanceRecord.Present ? "Marked Present" : "Marked Absent";
+			AttendanceStatusLabel.TextColor = attendanceRecord.Present ? Colors.Green : Colors.Red;
 			MarkAttendanceButton.IsEnabled = false;
 			MarkAttendanceButton.Text = "Attendance Marked";
 		}
@@ -126,12 +126,14 @@ public partial class MainPage : ContentPage
 				LocationStatusLabel.Text = "Not available";
 				LocationInfoLabel.Text = "Location permission denied. Cannot mark attendance.";
 				MarkAttendanceButton.IsEnabled = false;
+				await MarkAbsent();
 			}
 		}
 		catch (Exception ex)
 		{
 			Debug.WriteLine($"Error checking location permission: {ex.Message}");
 			LocationInfoLabel.Text = "Error checking location permissions";
+			await MarkAbsent();
 		}
 	}
 
@@ -144,7 +146,7 @@ public partial class MainPage : ContentPage
 
 			LocationStatusLabel.Text = "Locating...";
 
-			var request = new GeolocationRequest(GeolocationAccuracy.Best, TimeSpan.FromSeconds(10));
+			var request = new GeolocationRequest(GeolocationAccuracy.Best);
 			var location = await Geolocation.GetLocationAsync(request, _cancelTokenSource.Token);
 
 			if (location is not null)
@@ -157,8 +159,11 @@ public partial class MainPage : ContentPage
 					var classRoom = await CommonData.LoadTableDataById<ClassRoomModel>(TableNames.ClassRoom, _currentClass.ClassroomId);
 
 					if (classRoom is not null)
-						_isInClassRange = Math.Abs(location.Latitude - (double)classRoom.Latitude) < 0.01 &&
-										  Math.Abs(location.Longitude - (double)classRoom.Longitude) < 0.01;
+					{
+						double differenceKilometeres = Location.CalculateDistance(location, new Location((double)classRoom.Latitude, (double)classRoom.Longitude), DistanceUnits.Kilometers);
+						_isInClassRange = differenceKilometeres < 0.05;
+						//_isInClassRange = differenceKilometeres < 0.001;
+					}
 					else
 						_isInClassRange = false;
 
@@ -166,11 +171,13 @@ public partial class MainPage : ContentPage
 					{
 						LocationInfoLabel.Text = "You are within class location range";
 						MarkAttendanceButton.IsEnabled = true && !_isAttendanceMarked;
+						await MarkAttendance();
 					}
 					else
 					{
 						LocationInfoLabel.Text = "You are not in the classroom location";
 						MarkAttendanceButton.IsEnabled = false;
+						await MarkAbsent();
 					}
 				}
 				else
@@ -183,6 +190,7 @@ public partial class MainPage : ContentPage
 				LocationStatusLabel.Text = "Unknown";
 				LocationInfoLabel.Text = "Unable to determine your location";
 				MarkAttendanceButton.IsEnabled = false;
+				await MarkAbsent();
 			}
 		}
 		catch (Exception ex)
@@ -191,6 +199,7 @@ public partial class MainPage : ContentPage
 			LocationStatusLabel.Text = "Error";
 			LocationInfoLabel.Text = "Error determining your location";
 			MarkAttendanceButton.IsEnabled = false;
+			await MarkAbsent();
 		}
 		finally
 		{
@@ -198,7 +207,10 @@ public partial class MainPage : ContentPage
 		}
 	}
 
-	private async void MarkAttendanceButton_Clicked(object sender, EventArgs e)
+	private async void MarkAttendanceButton_Clicked(object sender, EventArgs e) =>
+		await MarkAttendance();
+
+	private async Task MarkAttendance()
 	{
 		if (_currentClass is null || !_locationPermissionGranted || !_isInClassRange)
 		{
@@ -207,13 +219,32 @@ public partial class MainPage : ContentPage
 			return;
 		}
 
+		if (await CheckMock())
+		{
+			await DisplayAlert("Mock Location Detected", "Please disable mock locations to use this app.", "OK");
+			await MarkAbsent();
+			return;
+		}
+
 		// Disable the button while processing
 		MarkAttendanceButton.IsEnabled = false;
 		MarkAttendanceButton.Text = "Processing...";
 
+		var existingAttendance = await AttendanceData.LoadAttendanceByScheduledClass(_currentClass.ScheduledClassId);
+		var attendanceRecord = existingAttendance.FirstOrDefault(a => a.StudentId == _student.Id);
+
+		if (attendanceRecord is not null && attendanceRecord.MarkedBy is not null)
+		{
+			await DisplayAlert("Attendance Already Marked",
+				"Your attendance has already been marked by the Teacher.", "OK");
+
+			MarkAttendanceButton.IsEnabled = true;
+			return;
+		}
+
 		await AttendanceData.InsertAttendance(new AttendanceModel
 		{
-			Id = 0,
+			Id = attendanceRecord?.Id ?? 0,
 			ScheduledClassId = _currentClass.ScheduledClassId,
 			StudentId = _student.Id,
 			Present = true,
@@ -227,8 +258,6 @@ public partial class MainPage : ContentPage
 		MarkAttendanceButton.Text = "Attendance Marked";
 
 		_isAttendanceMarked = true;
-
-		await DisplayAlert("Success", "Your attendance has been marked successfully!", "OK");
 	}
 
 	private async void RefreshButton_Clicked(object sender, EventArgs e)
@@ -249,5 +278,37 @@ public partial class MainPage : ContentPage
 			_cancelTokenSource?.Cancel();
 
 		base.OnDisappearing();
+	}
+
+	private async Task MarkAbsent()
+	{
+		var existingAttendance = await AttendanceData.LoadAttendanceByScheduledClass(_currentClass.ScheduledClassId);
+		var attendanceRecord = existingAttendance.FirstOrDefault(a => a.StudentId == _student.Id && a.MarkedBy is null);
+		if (attendanceRecord is not null)
+		{
+			await AttendanceData.InsertAttendance(new AttendanceModel
+			{
+				Id = attendanceRecord.Id,
+				ScheduledClassId = _currentClass.ScheduledClassId,
+				StudentId = _student.Id,
+				Present = false,
+				EntryTime = DateTime.Now,
+				MarkedBy = null
+			});
+
+			AttendanceStatusLabel.Text = "Marked Absent";
+			AttendanceStatusLabel.TextColor = Color.FromArgb("#ff9900");
+		}
+	}
+
+	public async Task<bool> CheckMock()
+	{
+		var request = new GeolocationRequest(GeolocationAccuracy.Best);
+		var location = await Geolocation.GetLocationAsync(request);
+
+		if (location is null || location.IsFromMockProvider)
+			return true;
+
+		return false;
 	}
 }
