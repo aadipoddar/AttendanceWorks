@@ -164,24 +164,61 @@
 				<!-- Location Info Card -->
 				<Border Style="{StaticResource CardBorderStyle}">
 					<VerticalStackLayout>
-						<Label Text="YOUR LOCATION" 
-                               Style="{StaticResource CardHeaderStyle}"/>
+						<Label Text="LOCATION INFORMATION" 
+								Style="{StaticResource CardHeaderStyle}"/>
 						<Grid ColumnDefinitions="*,*" Margin="0,10,0,0">
 							<Label Grid.Column="0" 
-                                   Text="Current:" 
-                                   FontAttributes="Bold"
-                                   TextColor="{AppThemeBinding Light=#555555, Dark=#BBBBBB}"/>
+								Text="Current:" 
+								FontAttributes="Bold"
+								TextColor="{AppThemeBinding Light=#555555, Dark=#BBBBBB}"/>
 							<Label Grid.Column="1" 
-                                   x:Name="LocationStatusLabel" 
-                                   Text="Checking..." 
-                                   TextColor="{AppThemeBinding Light=#555555, Dark=#BBBBBB}"/>
+								x:Name="LocationStatusLabel" 
+								Text="Checking..." 
+								TextColor="{AppThemeBinding Light=#555555, Dark=#BBBBBB}"/>
 						</Grid>
 						<Label x:Name="LocationInfoLabel" 
-                               Text="Location services must be enabled to mark attendance" 
-                               TextColor="{AppThemeBinding Light=#555555, Dark=#BBBBBB}"
-                               Margin="0,10,0,0"/>
+							Text="Location services must be enabled to mark attendance" 
+							TextColor="{AppThemeBinding Light=#555555, Dark=#BBBBBB}"
+							Margin="0,10,0,0"/>
+
+						<!-- Student Coordinates -->
+						<Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto" Margin="0,10,0,0">
+							<Label Grid.Row="0" Grid.Column="0"
+								Text="Your Location:" 
+								FontAttributes="Bold"
+								TextColor="{AppThemeBinding Light=#555555, Dark=#BBBBBB}"/>
+							<Label Grid.Row="0" Grid.Column="1"
+								x:Name="StudentCoordinatesLabel"
+								Text="Unknown"
+								Margin="10,0,0,0"
+								TextColor="{AppThemeBinding Light=#555555, Dark=#BBBBBB}"/>
+
+							<Label Grid.Row="1" Grid.Column="0"
+								Text="Class Location:" 
+								FontAttributes="Bold"
+								TextColor="{AppThemeBinding Light=#555555, Dark=#BBBBBB}"/>
+							<Label Grid.Row="1" Grid.Column="1"
+								x:Name="ClassCoordinatesLabel"
+								Text="Unknown"
+								Margin="10,0,0,0"
+								TextColor="{AppThemeBinding Light=#555555, Dark=#BBBBBB}"/>
+						</Grid>
+
+						<!-- Distance Information -->
+						<Grid ColumnDefinitions="Auto,*" Margin="0,10,0,0">
+							<Label Grid.Column="0" 
+								Text="Distance:" 
+								FontAttributes="Bold"
+								TextColor="{AppThemeBinding Light=#555555, Dark=#BBBBBB}"/>
+							<Label Grid.Column="1" 
+								x:Name="DistanceLabel" 
+								Text="Unknown" 
+								Margin="10,0,0,0"
+								TextColor="{AppThemeBinding Light=#555555, Dark=#BBBBBB}"/>
+						</Grid>
 					</VerticalStackLayout>
 				</Border>
+
 
 				<!-- Attendance Status Card -->
 				<Border Style="{StaticResource CardBorderStyle}">

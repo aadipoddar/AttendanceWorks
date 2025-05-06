@@ -164,6 +164,9 @@ public partial class MainPage : ContentPage
 			_cancelTokenSource = new CancellationTokenSource();
 
 			LocationStatusLabel.Text = "Locating...";
+			StudentCoordinatesLabel.Text = "Locating...";
+			ClassCoordinatesLabel.Text = "Unknown";
+			DistanceLabel.Text = "Calculating...";
 
 			var request = new GeolocationRequest(GeolocationAccuracy.Best);
 			var location = await Geolocation.GetLocationAsync(request, _cancelTokenSource.Token);
@@ -171,6 +174,7 @@ public partial class MainPage : ContentPage
 			if (location is not null)
 			{
 				LocationStatusLabel.Text = "Available";
+				StudentCoordinatesLabel.Text = $"Lat: {location.Latitude:F6}, Long: {location.Longitude:F6}";
 
 				// Check if student is in range of classroom
 				if (_currentClass is not null)
@@ -179,12 +183,23 @@ public partial class MainPage : ContentPage
 
 					if (classRoom is not null)
 					{
-						double differenceKilometeres = Location.CalculateDistance(location, new Location((double)classRoom.Latitude, (double)classRoom.Longitude), DistanceUnits.Kilometers);
-						_isInClassRange = differenceKilometeres < 0.05;
-						//_isInClassRange = differenceKilometeres < 0.001;
+						ClassCoordinatesLabel.Text = $"Lat: {classRoom.Latitude:F6}, Long: {classRoom.Longitude:F6}";
+
+						double differenceKilometeres = Location.CalculateDistance(
+							location,
+							new Location((double)classRoom.Latitude, (double)classRoom.Longitude),
+							DistanceUnits.Kilometers);
+
+						DistanceLabel.Text = $"{differenceKilometeres:F3} km";
+						//_isInClassRange = differenceKilometeres < 0.05;
+						_isInClassRange = differenceKilometeres < 0.001;
 					}
 					else
+					{
+						ClassCoordinatesLabel.Text = "Unknown";
+						DistanceLabel.Text = "Unknown";
 						_isInClassRange = false;
+					}
 
 					if (_isInClassRange)
 					{
@@ -204,11 +219,15 @@ public partial class MainPage : ContentPage
 				else
 				{
 					LocationInfoLabel.Text = "No active class to check location against";
+					ClassCoordinatesLabel.Text = "No active class";
+					DistanceLabel.Text = "N/A";
 				}
 			}
 			else
 			{
 				LocationStatusLabel.Text = "Unknown";
+				StudentCoordinatesLabel.Text = "Unknown";
+				DistanceLabel.Text = "Unknown";
 				LocationInfoLabel.Text = "Unable to determine your location";
 				MarkAttendanceButton.IsEnabled = false;
 				await MarkAbsent();
@@ -218,6 +237,8 @@ public partial class MainPage : ContentPage
 		{
 			Debug.WriteLine($"Error getting location: {ex.Message}");
 			LocationStatusLabel.Text = "Error";
+			StudentCoordinatesLabel.Text = "Error";
+			DistanceLabel.Text = "Error";
 			LocationInfoLabel.Text = "Error determining your location";
 			MarkAttendanceButton.IsEnabled = false;
 			await MarkAbsent();

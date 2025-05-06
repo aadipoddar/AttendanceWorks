@@ -1,3 +1,8 @@
+#if ANDROID
+using Plugin.Fingerprint;
+using Plugin.Fingerprint.Abstractions;
+#endif
+
 namespace AttendanceWorksMaui;
 
 public partial class LoginPage : ContentPage
@@ -8,15 +13,23 @@ public partial class LoginPage : ContentPage
 		BindingContext = this;
 	}
 
-	protected override async void OnAppearing()
-	{
-		base.OnAppearing();
-
+	private async void ContentPage_Loaded(object sender, EventArgs e) =>
 		await LoadSavedCredentials();
-	}
 
 	private async Task LoadSavedCredentials()
 	{
+
+#if ANDROID
+		var request = new AuthenticationRequestConfiguration("Biometric Authentication", "Use Biometric Authentication to Load the saved credentials");
+		var result = await CrossFingerprint.Current.AuthenticateAsync(request);
+
+		if (!result.Authenticated)
+		{
+			await DisplayAlert("Authentication Failed", "Please enter your credentials manually", "OK");
+			return;
+		}
+#endif
+
 		var username = await SecureStorage.GetAsync("email");
 		var password = await SecureStorage.GetAsync("password");
 
