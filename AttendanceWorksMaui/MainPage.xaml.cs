@@ -191,8 +191,8 @@ public partial class MainPage : ContentPage
 							DistanceUnits.Kilometers);
 
 						DistanceLabel.Text = $"{differenceKilometeres:F3} km";
-						//_isInClassRange = differenceKilometeres < 0.05;
-						_isInClassRange = differenceKilometeres < 0.001;
+						_isInClassRange = differenceKilometeres < 0.05;
+						//_isInClassRange = differenceKilometeres < 0.001;
 					}
 					else
 					{
@@ -357,9 +357,17 @@ public partial class MainPage : ContentPage
 		return false;
 	}
 
-	private void NavigateToClassButton_Clicked(object sender, EventArgs e)
+	private async void NavigateToClassButton_Clicked(object sender, EventArgs e)
 	{
+		var classRoom = await CommonData.LoadTableDataById<ClassRoomModel>(TableNames.ClassRoom, _currentClass.ClassroomId);
+		var location = new Location((double)classRoom.Latitude, (double)classRoom.Longitude);
+		var options = new MapLaunchOptions
+		{
+			Name = _currentClass.ClassroomName,
+			NavigationMode = NavigationMode.Driving
+		};
 
+		await Map.Default.OpenAsync(location, options);
 	}
 
 	private async void LogoutButton_Clicked(object sender, EventArgs e)
