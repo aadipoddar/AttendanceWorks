@@ -1,4 +1,6 @@
 using AttendanceWorksLibrary.Data;
+using AttendanceWorksLibrary.Models;
+using AttendanceWorksLibrary.Utilities;
 
 namespace AttendanceWorksMaui;
 
@@ -14,7 +16,6 @@ public partial class LoginPage : ContentPage
 	{
 		base.OnAppearing();
 
-		// Check if user has saved credentials
 		await LoadSavedCredentials();
 	}
 
@@ -92,10 +93,10 @@ public partial class LoginPage : ContentPage
 
 			await Navigation.PushAsync(new MainPage());
 		}
+
 		else
-		{
 			await DisplayAlert("Login Failed", "Invalid Email or Password", "OK");
-		}
+
 	}
 
 	private async Task<bool> CheckPassword(string email)
@@ -120,7 +121,36 @@ public partial class LoginPage : ContentPage
 
 	private async void ForgotPassword_Tapped(object sender, EventArgs e)
 	{
-		await DisplayAlert("Reset Password",
-			"Please contact your administrator or use the password reset feature on the web portal.", "OK");
+		if (string.IsNullOrWhiteSpace(emailEntry.Text))
+		{
+			await DisplayAlert("Enter Email or Roll Number", "Please enter your Email", "OK");
+			return;
+		}
+
+		var student = new StudentModel();
+
+		if (emailEntry.Text.Contains('@'))
+		{
+			student = await StudentData.LoadStudentByEmail(emailEntry.Text);
+			if (student is null)
+			{
+				await DisplayAlert("Email Not Found", "Please enter a valid Email", "OK");
+				return;
+			}
+		}
+
+		else
+		{
+			student = await StudentData.LoadStudentByRoll(int.Parse(emailEntry.Text));
+			if (student is null)
+			{
+				await DisplayAlert("Roll Number Not Found", "Please enter a valid Roll Number", "OK");
+				return;
+			}
+		}
+
+		Mailing.MailPassword(student.Email, student.Password);
+
+		await DisplayAlert("Password Mailed", "Your Password has been mailed to you to your Email Address", "OK");
 	}
 }
