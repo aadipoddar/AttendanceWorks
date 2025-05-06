@@ -7,7 +7,7 @@ public class AttendanceModel
 	public int StudentId { get; set; }
 	public bool Present { get; set; }
 	public DateTime EntryTime { get; set; }
-	public int MarkedBy { get; set; }
+	public int? MarkedBy { get; set; }
 }
 
 public class StudentAttendanceViewModel

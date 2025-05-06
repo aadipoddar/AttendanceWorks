@@ -33,6 +33,8 @@
 					<RowDefinition Height="Auto"/>
 					<RowDefinition Height="Auto"/>
 					<RowDefinition Height="Auto"/>
+					<RowDefinition Height="Auto"/>
+					<RowDefinition Height="Auto"/>
 				</Grid.RowDefinitions>
 
 				<Label Margin="10" Padding="5" Grid.Row="0" Grid.Column="0" Content="Name"/>
@@ -50,8 +52,11 @@
 				<Label Margin="10" Padding="5" Grid.Row="4" Grid.Column="0" Content="Phone Number"/>
 				<TextBox x:Name="phoneTextBox" Margin="10" Padding="5" Grid.Row="4" Grid.Column="1" PreviewTextInput="integerTextBox_PreviewTextInput"/>
 
-				<CheckBox x:Name="statusCheckBox" Margin="10" Padding="5" Grid.Row="5" Grid.Column="0" Content="Status" IsChecked="True"/>
-				<Button x:Name="saveButton" Margin="10" Padding="5" Grid.Row="6" Grid.Column="1" MinWidth="120" MinHeight="40" Content="Save" HorizontalAlignment="Center"
+				<Label Margin="10" Padding="5" Grid.Row="5" Grid.Column="0" Content="Section"/>
+				<ComboBox x:Name="sectionComboBox" Margin="10" Padding="5" Grid.Row="5" Grid.Column="1" />
+
+				<CheckBox x:Name="statusCheckBox" Margin="10" Padding="5" Grid.Row="6" Grid.Column="0" Content="Status" IsChecked="True"/>
+				<Button x:Name="saveButton" Margin="10" Padding="5" Grid.Row="7" Grid.Column="1" MinWidth="120" MinHeight="40" Content="Save" HorizontalAlignment="Center"
 					IsDefault="True" Style="{DynamicResource AccentButtonStyle}" Click="saveButton_Click"/>
 			</Grid>
 

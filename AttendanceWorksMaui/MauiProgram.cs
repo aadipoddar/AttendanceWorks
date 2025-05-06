@@ -6,6 +6,9 @@ public static class MauiProgram
 {
 	public static MauiApp CreateMauiApp()
 	{
+		Dapper.SqlMapper.AddTypeHandler(new SqlDateOnlyTypeHandler());
+		Dapper.SqlMapper.AddTypeHandler(new SqlTimeOnlyTypeHandler());
+
 		var builder = MauiApp.CreateBuilder();
 		builder
 			.UseMauiApp<App>()

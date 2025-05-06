@@ -14,7 +14,7 @@
             <Label x:Name="DateLabel" 
                    Text="May 5, 2025" 
                    FontSize="16" 
-                   TextColor="#666666"/>
+                   TextColor="NavajoWhite"/>
         </VerticalStackLayout>
 
         <!-- Main Content -->
@@ -34,7 +34,7 @@
                                Text="No active class" 
                                FontSize="20" 
                                FontAttributes="Bold" 
-                               Margin="0,5,0,5"/>
+                               Margin="0,5,0,5" TextColor="#666666"/>
                         <Grid ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto">
                             <Label Grid.Column="0" Grid.Row="0" 
                                    Text="Time:" 
@@ -43,6 +43,7 @@
                             <Label Grid.Column="1" Grid.Row="0" 
                                    x:Name="ClassTimeLabel" 
                                    Text="N/A" 
+								   Margin="10,0,0,0"
                                    TextColor="#666666"/>
                             
                             <Label Grid.Column="0" Grid.Row="1" 
@@ -51,6 +52,7 @@
                                    TextColor="#666666"/>
                             <Label Grid.Column="1" Grid.Row="1" 
                                    x:Name="ClassRoomLabel" 
+								   Margin="10,0,0,0"
                                    Text="N/A" 
                                    TextColor="#666666"/>
                             

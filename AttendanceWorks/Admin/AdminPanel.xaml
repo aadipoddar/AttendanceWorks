@@ -36,7 +36,6 @@
 				<Button Content="Course" Grid.Row="3" Margin="10" Padding="5" MinWidth="120" MinHeight="40" HorizontalAlignment="Stretch" Click="courseButton_Click" />
 				<Button Content="Section" Grid.Row="4" Margin="10" Padding="5" MinWidth="120" MinHeight="40" HorizontalAlignment="Stretch" Click="sectionButton_Click" />
 				<Button Content="Course Section" Grid.Row="5" Margin="10" Padding="5" MinWidth="120" MinHeight="40" HorizontalAlignment="Stretch" Click="courseSectionButton_Click" />
-				<Button Content="Section Student" Grid.Row="6" Margin="10" Padding="5" MinWidth="120" MinHeight="40" HorizontalAlignment="Stretch" Click="sectionStudentButton_Click" />
 				<Button Content="Scheduled Class" Grid.Row="7" Margin="10" Padding="5" MinWidth="120" MinHeight="40" HorizontalAlignment="Stretch" Click="scheduledClassButton_Click" />
 			</Grid>
 		</ScrollViewer>

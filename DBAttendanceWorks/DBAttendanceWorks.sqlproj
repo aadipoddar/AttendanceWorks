@@ -7,7 +7,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectVersion>4.1</ProjectVersion>
     <ProjectGuid>{090b6d4d-02df-4535-85c6-d1f7b9da6132}</ProjectGuid>
-    <DSP>Microsoft.Data.Tools.Schema.Sql.Sql160DatabaseSchemaProvider</DSP>
+    <DSP>Microsoft.Data.Tools.Schema.Sql.SqlAzureV12DatabaseSchemaProvider</DSP>
     <OutputType>Database</OutputType>
     <RootPath>
     </RootPath>
@@ -66,6 +66,7 @@
     <Folder Include="StoredProcedure\LoadData\Student" />
     <Folder Include="StoredProcedure\LoadData\Teacher" />
     <Folder Include="StoredProcedure\LoadData\Attendance" />
+    <Folder Include="Compares" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Tables\Student.sql" />
@@ -77,7 +78,6 @@
     <Build Include="StoredProcedure\LoadData\Student\Load_Student_By_Email.sql" />
     <Build Include="StoredProcedure\LoadData\Teacher\Load_Teacher_By_Email_Password.sql" />
     <Build Include="Tables\Section.sql" />
-    <Build Include="Tables\SectionStudent.sql" />
     <Build Include="Tables\Course.sql" />
     <Build Include="Tables\CourseSection.sql" />
     <Build Include="Tables\ScheduledClass.sql" />
@@ -88,7 +88,6 @@
     <Build Include="StoredProcedure\Insert\Insert_Course.sql" />
     <Build Include="StoredProcedure\Insert\Insert_CourseSection.sql" />
     <Build Include="StoredProcedure\Insert\Insert_Section.sql" />
-    <Build Include="StoredProcedure\Insert\Insert_SectionStudent.sql" />
     <Build Include="StoredProcedure\Insert\Insert_ScheduledClass.sql" />
     <Build Include="StoredProcedure\Insert\Insert_Attendance.sql" />
     <Build Include="Views\View_ActiveClasses.sql" />
@@ -102,5 +101,8 @@
   <ItemGroup>
     <None Include="DBAttendanceWorks.publish.xml" />
     <None Include="PublishLocations\DBAttendanceWorks.publish.xml" />
+    <None Include="DBAttendanceWorks_1.publish.xml" />
+    <None Include="PublishLocations\AzureDBAttendanceWorks.publish.xml" />
+    <None Include="Compares\DataCompare.dcmp" />
   </ItemGroup>
 </Project>

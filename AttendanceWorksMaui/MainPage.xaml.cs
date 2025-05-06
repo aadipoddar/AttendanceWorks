@@ -1,12 +1,10 @@
 ﻿using System.Diagnostics;
 
-using AttendanceWorksLibrary.Models;
-
 namespace AttendanceWorksMaui;
 
 public partial class MainPage : ContentPage
 {
-	private StudentModel _currentStudent;
+	private readonly StudentModel _student;
 	private ActiveClassModel _currentClass;
 	private bool _locationPermissionGranted;
 	private bool _isInClassRange;
@@ -14,9 +12,10 @@ public partial class MainPage : ContentPage
 	private CancellationTokenSource _cancelTokenSource;
 	private bool _isCheckingLocation;
 
-	public MainPage()
+	public MainPage(StudentModel student)
 	{
 		InitializeComponent();
+		_student = student;
 	}
 
 	protected override async void OnAppearing()
@@ -25,9 +24,7 @@ public partial class MainPage : ContentPage
 
 		// Initialize UI with current date
 		DateLabel.Text = DateTime.Now.ToString("MMMM d, yyyy");
-
-		// Load student info
-		await LoadStudentInfo();
+		WelcomeLabel.Text = $"Hello, {_student.Name} ({_student.Roll})";
 
 		// Check for active classes
 		await RefreshClassInfo();
@@ -36,103 +33,57 @@ public partial class MainPage : ContentPage
 		await CheckLocationPermission();
 	}
 
-	private async Task LoadStudentInfo()
-	{
-		try
-		{
-			// Simulate loading student information
-			await Task.Delay(500);
-			_currentStudent = new StudentModel
-			{
-				Id = 1,
-				Name = "John Smith",
-				Roll = 101
-			};
-
-			WelcomeLabel.Text = $"Hello, {_currentStudent.Name}";
-		}
-		catch (Exception ex)
-		{
-			Debug.WriteLine($"Error loading student info: {ex.Message}");
-			await DisplayAlert("Error", "Failed to load student information.", "OK");
-		}
-	}
-
 	private async Task RefreshClassInfo()
 	{
-		try
+		// Show loading state
+		CurrentClassLabel.Text = "Checking for active classes...";
+		StatusLabel.Text = "CHECKING";
+		StatusLabel.TextColor = Colors.Orange;
+
+		var activeClasses = await CommonData.LoadTableData<ActiveClassModel>(ViewNames.ViewActiveClasses);
+		_currentClass = activeClasses.Where(x => x.SectionId == _student.SectionId).FirstOrDefault();
+
+		if (_currentClass is not null)
 		{
-			// Show loading state
-			CurrentClassLabel.Text = "Checking for active classes...";
-			StatusLabel.Text = "CHECKING";
-			StatusLabel.TextColor = Colors.Orange;
+			CurrentClassLabel.Text = $"{_currentClass.CourseCode}: {_currentClass.CourseName}";
+			ClassTimeLabel.Text = $"{_currentClass.StartTime:hh\\:mm tt} - {_currentClass.EndTime:hh\\:mm tt}";
+			ClassRoomLabel.Text = _currentClass.ClassroomName;
+			StatusLabel.Text = "ACTIVE";
+			StatusLabel.TextColor = Colors.Green;
 
-			// Simulate API call to check for active classes
-			await Task.Delay(1000);
-
-			// Check if there's an active class for the student
-			var hasActiveClass = DateTime.Now.Hour >= 9 && DateTime.Now.Hour < 17; // Simulate check
-
-			if (hasActiveClass)
-			{
-				// Simulate active class data
-				_currentClass = new ActiveClassModel
-				{
-					CourseName = "Introduction to Programming",
-					CourseCode = "CS101",
-					SectionName = "Section A",
-					ClassroomName = "Room 301",
-					StartTime = new TimeOnly(9, 0),
-					EndTime = new TimeOnly(10, 30)
-				};
-
-				CurrentClassLabel.Text = $"{_currentClass.CourseCode}: {_currentClass.CourseName}";
-				ClassTimeLabel.Text = $"{_currentClass.StartTime:hh\\:mm tt} - {_currentClass.EndTime:hh\\:mm tt}";
-				ClassRoomLabel.Text = _currentClass.ClassroomName;
-				StatusLabel.Text = "ACTIVE";
-				StatusLabel.TextColor = Colors.Green;
-
-				// Enable mark attendance button
-				MarkAttendanceButton.IsEnabled = true;
-			}
-			else
-			{
-				_currentClass = null;
-				CurrentClassLabel.Text = "No active class";
-				ClassTimeLabel.Text = "N/A";
-				ClassRoomLabel.Text = "N/A";
-				StatusLabel.Text = "INACTIVE";
-				StatusLabel.TextColor = Color.FromArgb("#ff6b6b");
-
-				// Disable mark attendance button
-				MarkAttendanceButton.IsEnabled = false;
-			}
-
-			// Check if attendance is already marked
-			await CheckAttendanceStatus();
+			// Enable mark attendance button
+			MarkAttendanceButton.IsEnabled = true;
 		}
-		catch (Exception ex)
+		else
 		{
-			Debug.WriteLine($"Error refreshing class info: {ex.Message}");
-			CurrentClassLabel.Text = "Failed to load class info";
-			await DisplayAlert("Error", "Failed to refresh class information.", "OK");
+			_currentClass = null;
+			CurrentClassLabel.Text = "No active class";
+			ClassTimeLabel.Text = "N/A";
+			ClassRoomLabel.Text = "N/A";
+			StatusLabel.Text = "INACTIVE";
+			StatusLabel.TextColor = Color.FromArgb("#ff6b6b");
+
+			// Disable mark attendance button
+			MarkAttendanceButton.IsEnabled = false;
 		}
+
+		// Check if attendance is already marked
+		await CheckAttendanceStatus();
 	}
 
 	private async Task CheckAttendanceStatus()
 	{
-		if (_currentClass == null)
+		if (_currentClass is null)
 		{
 			AttendanceStatusLabel.Text = "No active class";
 			AttendanceStatusLabel.TextColor = Colors.Grey;
 			return;
 		}
 
-		// Simulate checking if attendance is already marked
-		await Task.Delay(500);
-		bool isAttendanceMarked = false; // Simulate check
+		var existingAttendance = await AttendanceData.LoadAttendanceByScheduledClass(_currentClass.ScheduledClassId);
+		var attendanceRecord = existingAttendance.FirstOrDefault(a => a.StudentId == _student.Id);
 
-		_isAttendanceMarked = isAttendanceMarked;
+		_isAttendanceMarked = attendanceRecord is not null && attendanceRecord.Present;
 
 		if (_isAttendanceMarked)
 		{
@@ -143,6 +94,8 @@ public partial class MainPage : ContentPage
 		}
 		else
 		{
+			_isAttendanceMarked = false;
+
 			AttendanceStatusLabel.Text = "Not marked";
 			AttendanceStatusLabel.TextColor = Color.FromArgb("#ff9900");
 		}
@@ -154,11 +107,11 @@ public partial class MainPage : ContentPage
 		{
 			LocationInfoLabel.Text = "Checking location permissions...";
 
-			var status = await Permissions.CheckStatusAsync<Permissions.LocationWhenInUse>();
+			var status = await Permissions.CheckStatusAsync<Permissions.LocationAlways>();
 
 			if (status != PermissionStatus.Granted)
 			{
-				status = await Permissions.RequestAsync<Permissions.LocationWhenInUse>();
+				status = await Permissions.RequestAsync<Permissions.LocationAlways>();
 			}
 
 			_locationPermissionGranted = (status == PermissionStatus.Granted);
@@ -191,18 +144,23 @@ public partial class MainPage : ContentPage
 
 			LocationStatusLabel.Text = "Locating...";
 
-			var request = new GeolocationRequest(GeolocationAccuracy.Medium, TimeSpan.FromSeconds(10));
+			var request = new GeolocationRequest(GeolocationAccuracy.Best, TimeSpan.FromSeconds(10));
 			var location = await Geolocation.GetLocationAsync(request, _cancelTokenSource.Token);
 
-			if (location != null)
+			if (location is not null)
 			{
 				LocationStatusLabel.Text = "Available";
 
 				// Check if student is in range of classroom
-				if (_currentClass != null)
+				if (_currentClass is not null)
 				{
-					// Simulate classroom location check
-					_isInClassRange = true; // Simulate check
+					var classRoom = await CommonData.LoadTableDataById<ClassRoomModel>(TableNames.ClassRoom, _currentClass.ClassroomId);
+
+					if (classRoom is not null)
+						_isInClassRange = Math.Abs(location.Latitude - (double)classRoom.Latitude) < 0.01 &&
+										  Math.Abs(location.Longitude - (double)classRoom.Longitude) < 0.01;
+					else
+						_isInClassRange = false;
 
 					if (_isInClassRange)
 					{
@@ -242,38 +200,35 @@ public partial class MainPage : ContentPage
 
 	private async void MarkAttendanceButton_Clicked(object sender, EventArgs e)
 	{
-		if (_currentClass == null || !_locationPermissionGranted || !_isInClassRange)
+		if (_currentClass is null || !_locationPermissionGranted || !_isInClassRange)
 		{
 			await DisplayAlert("Cannot Mark Attendance",
 				"Make sure you have an active class and are in the classroom location.", "OK");
 			return;
 		}
 
-		try
+		// Disable the button while processing
+		MarkAttendanceButton.IsEnabled = false;
+		MarkAttendanceButton.Text = "Processing...";
+
+		await AttendanceData.InsertAttendance(new AttendanceModel
 		{
-			// Disable the button while processing
-			MarkAttendanceButton.IsEnabled = false;
-			MarkAttendanceButton.Text = "Processing...";
+			Id = 0,
+			ScheduledClassId = _currentClass.ScheduledClassId,
+			StudentId = _student.Id,
+			Present = true,
+			EntryTime = DateTime.Now,
+			MarkedBy = null
+		});
 
-			// Simulate marking attendance
-			await Task.Delay(1500);
+		// Update UI to show attendance marked
+		AttendanceStatusLabel.Text = "Marked Present";
+		AttendanceStatusLabel.TextColor = Colors.Green;
+		MarkAttendanceButton.Text = "Attendance Marked";
 
-			// Update UI to show attendance marked
-			AttendanceStatusLabel.Text = "Marked Present";
-			AttendanceStatusLabel.TextColor = Colors.Green;
-			MarkAttendanceButton.Text = "Attendance Marked";
+		_isAttendanceMarked = true;
 
-			_isAttendanceMarked = true;
-
-			await DisplayAlert("Success", "Your attendance has been marked successfully!", "OK");
-		}
-		catch (Exception ex)
-		{
-			Debug.WriteLine($"Error marking attendance: {ex.Message}");
-			MarkAttendanceButton.IsEnabled = true;
-			MarkAttendanceButton.Text = "Mark My Attendance";
-			await DisplayAlert("Error", "Failed to mark attendance. Please try again.", "OK");
-		}
+		await DisplayAlert("Success", "Your attendance has been marked successfully!", "OK");
 	}
 
 	private async void RefreshButton_Clicked(object sender, EventArgs e)
@@ -291,9 +246,8 @@ public partial class MainPage : ContentPage
 	protected override void OnDisappearing()
 	{
 		if (_isCheckingLocation)
-		{
 			_cancelTokenSource?.Cancel();
-		}
+
 		base.OnDisappearing();
 	}
 }

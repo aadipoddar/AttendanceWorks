@@ -6,5 +6,7 @@
     [Email] VARCHAR(100) NOT NULL UNIQUE, 
     [Phone] VARCHAR(10) NOT NULL UNIQUE, 
     [Password] VARCHAR(10) NOT NULL, 
-    [Status] BIT NOT NULL DEFAULT 1
+    [SectionId] INT NOT NULL,
+    [Status] BIT NOT NULL DEFAULT 1, 
+    CONSTRAINT [FK_Student_ToSection] FOREIGN KEY (SectionId) REFERENCES [Section](Id)
 )

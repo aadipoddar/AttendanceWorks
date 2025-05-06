@@ -5,15 +5,16 @@
 	@Email VARCHAR(100),
 	@Phone VARCHAR(10),
 	@Password VARCHAR(10),
+	@SectionId INT,
 	@Status BIT
 AS
 BEGIN
 	IF @Id = 0
 	BEGIN
 		INSERT INTO [dbo].[Student]
-			([Name], [Roll], [Email], [Phone], [Password], [Status])
+			([Name], [Roll], [Email], [Phone], [Password], [SectionId], [Status])
 		VALUES
-			(@Name, @Roll, @Email, @Phone, @Password, @Status)
+			(@Name, @Roll, @Email, @Phone, @Password, @SectionId, @Status)
 	END
 
 	ELSE
@@ -25,6 +26,7 @@ BEGIN
 			[Email] = @Email,
 			[Phone] = @Phone,
 			[Password] = @Password,
+			[SectionId] = @SectionId,
 			[Status] = @Status
 		WHERE [Id] = @Id
 	END

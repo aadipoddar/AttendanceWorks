@@ -18,6 +18,11 @@ public partial class StudentPage : Page
 	{
 		var students = await CommonData.LoadTableData<StudentModel>(TableNames.Student);
 		studentDataGrid.ItemsSource = students;
+
+		sectionComboBox.ItemsSource = await CommonData.LoadTableDataByStatus<SectionModel>(TableNames.Section);
+		sectionComboBox.DisplayMemberPath = nameof(SectionModel.Name);
+		sectionComboBox.SelectedValuePath = nameof(SectionModel.Id);
+		sectionComboBox.SelectedIndex = 0;
 	}
 
 	private void studentDataGrid_SelectedCellsChanged(object sender, SelectedCellsChangedEventArgs e)
@@ -29,6 +34,7 @@ public partial class StudentPage : Page
 			emailTextBox.Text = student.Email;
 			phoneTextBox.Text = student.Phone;
 			rollTextBox.Text = student.Roll.ToString();
+			sectionComboBox.SelectedValue = student.SectionId;
 			statusCheckBox.IsChecked = student.Status;
 		}
 
@@ -49,6 +55,7 @@ public partial class StudentPage : Page
 			Email = emailTextBox.Text,
 			Phone = phoneTextBox.Text,
 			Roll = int.Parse(rollTextBox.Text),
+			SectionId = (int)sectionComboBox.SelectedValue,
 			Status = statusCheckBox.IsChecked ?? false
 		});
 
@@ -63,6 +70,7 @@ public partial class StudentPage : Page
 		emailTextBox.Text = string.Empty;
 		phoneTextBox.Text = string.Empty;
 		rollTextBox.Text = string.Empty;
+		sectionComboBox.SelectedIndex = 0;
 		statusCheckBox.IsChecked = true;
 	}
 

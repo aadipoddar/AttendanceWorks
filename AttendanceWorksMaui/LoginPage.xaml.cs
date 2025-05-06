@@ -1,7 +1,3 @@
-using AttendanceWorksLibrary.Data;
-using AttendanceWorksLibrary.Models;
-using AttendanceWorksLibrary.Utilities;
-
 namespace AttendanceWorksMaui;
 
 public partial class LoginPage : ContentPage
@@ -91,7 +87,7 @@ public partial class LoginPage : ContentPage
 				SecureStorage.Remove("password");
 			}
 
-			await Navigation.PushAsync(new MainPage());
+			await Navigation.PushAsync(new MainPage(student));
 		}
 
 		else
