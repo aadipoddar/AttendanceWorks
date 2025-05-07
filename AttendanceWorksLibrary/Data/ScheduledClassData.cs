@@ -2,6 +2,6 @@
 
 public static class ScheduledClassData
 {
-	public static async Task InsertScheduledClass(ScheduledClassModel scheduledClassModel) =>
-		await SqlDataAccess.SaveData(StoredProcedureNames.InsertScheduledClass, scheduledClassModel);
+	public static async Task<int> InsertScheduledClass(ScheduledClassModel scheduledClassModel) =>
+		(await SqlDataAccess.LoadData<int, dynamic>(StoredProcedureNames.InsertScheduledClass, scheduledClassModel)).FirstOrDefault();
 }

@@ -50,7 +50,10 @@ public partial class ScheduledClassPage : Page
 		if (!ValidateForm())
 			return;
 
-		await ScheduledClassData.InsertScheduledClass(new ScheduledClassModel
+		if (scheduledClassDataGrid.SelectedItem is ScheduledClassModel scheduledClass)
+			await AttendanceData.DeleteAttendanceByScheduledClass(scheduledClass.Id);
+
+		int scheduledClassId = await ScheduledClassData.InsertScheduledClass(new ScheduledClassModel
 		{
 			Id = (scheduledClassDataGrid.SelectedItem as ScheduledClassModel)?.Id ?? 0,
 			CourseSectionId = (int)courseSectionComboBox.SelectedValue,
@@ -59,6 +62,22 @@ public partial class ScheduledClassPage : Page
 			EndTime = new TimeOnly(int.Parse(endTimeTextBox.Text), 0),
 			Status = statusCheckBox.IsChecked ?? false
 		});
+
+		var courseSection = courseSectionComboBox.SelectedItem as CourseSectionModel;
+		var students = await StudentData.LoadStudentBySection(courseSection.SectionId);
+
+		foreach (var student in students)
+		{
+			await AttendanceData.InsertAttendance(new AttendanceModel
+			{
+				Id = 0,
+				ScheduledClassId = (scheduledClassDataGrid.SelectedItem as ScheduledClassModel)?.Id ?? scheduledClassId,
+				StudentId = student.Id,
+				Present = false,
+				EntryTime = DateTime.Now,
+				MarkedBy = null
+			});
+		}
 
 		await LoadData();
 		ClearForm();

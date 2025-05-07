@@ -34,6 +34,8 @@ public static class StoredProcedureNames
 	public static string InsertCourseSection => "Insert_CourseSection";
 	public static string InsertScheduledClass => "Insert_ScheduledClass";
 	public static string InsertAttendance => "Insert_Attendance";
+
+	public static string DeleteAttendanceByScheduledClass => "Delete_Attendance_By_ScheduledClass";
 }
 
 public static class ViewNames
