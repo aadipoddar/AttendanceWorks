@@ -1,8 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net9.0-android;net9.0-ios;net9.0-maccatalyst</TargetFrameworks>
-		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net9.0-windows10.0.19041.0</TargetFrameworks>
+		<TargetFrameworks>net9.0-android;net9.0-maccatalyst</TargetFrameworks>
 		<!-- Uncomment to also build the tizen app. You will need to install tizen by following this: https://github.com/Samsung/Tizen.NET -->
 		<!-- <TargetFrameworks>$(TargetFrameworks);net9.0-tizen</TargetFrameworks> -->
 
@@ -21,10 +20,10 @@
 		<Nullable>disable</Nullable>
 
 		<!-- Display name -->
-		<ApplicationTitle>AttendanceWorksMaui</ApplicationTitle>
+		<ApplicationTitle>Stu10Dance</ApplicationTitle>
 
 		<!-- App Identifier -->
-		<ApplicationId>com.companyname.attendanceworksmaui</ApplicationId>
+		<ApplicationId>com.aadisoft.attendanceworks</ApplicationId>
 
 		<!-- Versions -->
 		<ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
@@ -42,35 +41,43 @@
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net9.0-android|AnyCPU'">
-	  <ApplicationTitle>Attendance Works</ApplicationTitle>
+	  <ApplicationTitle>Stu10Dance</ApplicationTitle>
+	  <ApplicationId>com.aadisoft.attendanceworks</ApplicationId>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net9.0-ios|AnyCPU'">
-	  <ApplicationTitle>Attendance Works</ApplicationTitle>
+	  <ApplicationTitle>Stu10Dance</ApplicationTitle>
+	  <ApplicationId>com.aadisoft.attendanceworks</ApplicationId>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net9.0-maccatalyst|AnyCPU'">
-	  <ApplicationTitle>Attendance Works</ApplicationTitle>
+	  <ApplicationTitle>Stu10Dance</ApplicationTitle>
+	  <ApplicationId>com.aadisoft.attendanceworks</ApplicationId>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net9.0-windows10.0.19041.0|AnyCPU'">
-	  <ApplicationTitle>Attendance Works</ApplicationTitle>
+	  <ApplicationTitle>Stu10Dance</ApplicationTitle>
+	  <ApplicationId>com.aadisoft.attendanceworks</ApplicationId>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net9.0-android|AnyCPU'">
-	  <ApplicationTitle>Attendance Works</ApplicationTitle>
+	  <ApplicationTitle>Stu10Dance</ApplicationTitle>
+	  <ApplicationId>com.aadisoft.attendanceworks</ApplicationId>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net9.0-ios|AnyCPU'">
-	  <ApplicationTitle>Attendance Works</ApplicationTitle>
+	  <ApplicationTitle>Stu10Dance</ApplicationTitle>
+	  <ApplicationId>com.aadisoft.attendanceworks</ApplicationId>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net9.0-maccatalyst|AnyCPU'">
-	  <ApplicationTitle>Attendance Works</ApplicationTitle>
+	  <ApplicationTitle>Stu10Dance</ApplicationTitle>
+	  <ApplicationId>com.aadisoft.attendanceworks</ApplicationId>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net9.0-windows10.0.19041.0|AnyCPU'">
-	  <ApplicationTitle>Attendance Works</ApplicationTitle>
+	  <ApplicationTitle>Stu10Dance</ApplicationTitle>
+	  <ApplicationId>com.aadisoft.attendanceworks</ApplicationId>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -82,7 +89,6 @@
 
 		<!-- Images -->
 		<MauiImage Include="Resources\Images\*" />
-		<MauiImage Update="Resources\Images\dotnet_bot.png" Resize="True" BaseSize="300,185" />
 
 		<!-- Custom Fonts -->
 		<MauiFont Include="Resources\Fonts\*" />
@@ -147,6 +153,10 @@
 	  <Using Include="AttendanceWorksLibrary.DataAccess" />
 	  <Using Include="AttendanceWorksLibrary.Models" />
 	  <Using Include="AttendanceWorksLibrary.Utilities" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Resources\Images\" />
 	</ItemGroup>
 
 </Project>

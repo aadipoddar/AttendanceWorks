@@ -57,6 +57,61 @@ public partial class LoginPage : ContentPage
 		}
 	}
 
+	private void TogglePasswordVisibility(object sender, EventArgs e)
+	{
+		passwordEntry.IsPassword = !passwordEntry.IsPassword;
+		((ImageButton)sender).Source = passwordEntry.IsPassword ? "view.png" : "hide.png";
+	}
+
+	private async void ForgotPassword_Tapped(object sender, EventArgs e)
+	{
+		if (string.IsNullOrWhiteSpace(emailEntry.Text))
+		{
+			await DisplayAlert("Enter Email or Roll Number", "Please enter your Email", "OK");
+			return;
+		}
+
+		if (!await CheckInternetConnectivity())
+			return;
+
+		StudentModel student;
+
+		if (emailEntry.Text.Contains('@'))
+		{
+			student = await StudentData.LoadStudentByEmail(emailEntry.Text);
+			if (student is null)
+			{
+				await DisplayAlert("Email Not Found", "Please enter a valid Email", "OK");
+				return;
+			}
+		}
+		else
+		{
+			student = await StudentData.LoadStudentByRoll(int.Parse(emailEntry.Text));
+			if (student is null)
+			{
+				await DisplayAlert("Roll Number Not Found", "Please enter a valid Roll Number", "OK");
+				return;
+			}
+		}
+
+		Mailing.MailPassword(student.Email, student.Password);
+
+		await DisplayAlert("Password Mailed", "Your Password has been mailed to you to your Email Address", "OK");
+	}
+
+	private async Task<bool> CheckInternetConnectivity()
+	{
+		var current = Connectivity.NetworkAccess;
+
+		if (current == NetworkAccess.Internet)
+			return true;
+
+		await DisplayAlert("No Internet Connection",
+			"Please check your internet connection and try again.", "OK");
+		return false;
+	}
+
 	private async void LoginButton_Clicked(object sender, EventArgs e)
 	{
 		if (string.IsNullOrWhiteSpace(emailEntry.Text) ||
@@ -66,7 +121,9 @@ public partial class LoginPage : ContentPage
 			return;
 		}
 
-		// Show loading indicator
+		if (!await CheckInternetConnectivity())
+			return;
+
 		IsBusy = true;
 
 		await LoginUser();
@@ -75,6 +132,26 @@ public partial class LoginPage : ContentPage
 		passwordEntry.Text = "";
 
 		IsBusy = false;
+	}
+
+	private async Task<bool> CheckPassword(string email)
+	{
+		var student = await StudentData.LoadStudentByEmail(email);
+
+		if (student is not null)
+			return passwordEntry.Text == student.Password;
+
+		return false;
+	}
+
+	private async Task<bool> CheckPassword(int roll)
+	{
+		var student = await StudentData.LoadStudentByRoll(roll);
+
+		if (student is not null)
+			return passwordEntry.Text == student.Password;
+
+		return false;
 	}
 
 	private async Task LoginUser()
@@ -100,75 +177,13 @@ public partial class LoginPage : ContentPage
 				SecureStorage.Remove("password");
 			}
 
-			passwordEntry.Text = "";
 			emailEntry.Text = "";
+			passwordEntry.Text = "";
 
 			await Navigation.PushAsync(new MainPage(student));
 		}
 
 		else
-			await DisplayAlert("Login Failed", "Invalid Email or Password", "OK");
-
-	}
-
-	private async Task<bool> CheckPassword(string email)
-	{
-		var student = await StudentData.LoadStudentByEmail(email);
-
-		if (student is not null)
-			return passwordEntry.Text == student.Password;
-
-		return false;
-	}
-
-	private async Task<bool> CheckPassword(int roll)
-	{
-		var student = await StudentData.LoadStudentByRoll(roll);
-
-		if (student is not null)
-			return passwordEntry.Text == student.Password;
-
-		return false;
-	}
-
-	private async void ForgotPassword_Tapped(object sender, EventArgs e)
-	{
-		if (string.IsNullOrWhiteSpace(emailEntry.Text))
-		{
-			await DisplayAlert("Enter Email or Roll Number", "Please enter your Email", "OK");
-			return;
-		}
-
-		var student = new StudentModel();
-
-		if (emailEntry.Text.Contains('@'))
-		{
-			student = await StudentData.LoadStudentByEmail(emailEntry.Text);
-			if (student is null)
-			{
-				await DisplayAlert("Email Not Found", "Please enter a valid Email", "OK");
-				return;
-			}
-		}
-
-		else
-		{
-			student = await StudentData.LoadStudentByRoll(int.Parse(emailEntry.Text));
-			if (student is null)
-			{
-				await DisplayAlert("Roll Number Not Found", "Please enter a valid Roll Number", "OK");
-				return;
-			}
-		}
-
-		Mailing.MailPassword(student.Email, student.Password);
-
-		await DisplayAlert("Password Mailed", "Your Password has been mailed to you to your Email Address", "OK");
-	}
-
-	private void TogglePasswordVisibility(object sender, EventArgs e)
-	{
-		passwordEntry.IsPassword = !passwordEntry.IsPassword;
-		((ImageButton)sender).Source = passwordEntry.IsPassword ? "view.png" : "hide.png";
+			await DisplayAlert("Login Failed", "Incorrect Email or Password", "OK");
 	}
 }
