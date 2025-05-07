@@ -279,23 +279,9 @@
 		</ScrollView>
 
 		<!-- Footer with Actions -->
-		<Grid Grid.Row="2" Padding="20,15,20,30" ColumnDefinitions="*,*" RowDefinitions="Auto,Auto">
-			<!-- Main Action Button with Gradient -->
-			<Button Grid.ColumnSpan="2" Grid.Row="0"
-                    x:Name="MarkAttendanceButton" 
-                    Text="Mark My Attendance" 
-                    Style="{StaticResource PrimaryButtonStyle}"
-                    Clicked="MarkAttendanceButton_Clicked">
-				<Button.Background>
-					<LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-						<GradientStop Color="#4CAF50" Offset="0.1"/>
-						<GradientStop Color="#2196F3" Offset="0.9"/>
-					</LinearGradientBrush>
-				</Button.Background>
-			</Button>
-
+		<Grid Grid.Row="2" Padding="20,15,20,30" ColumnDefinitions="*,*">
 			<!-- Secondary Actions -->
-			<Button Grid.Column="0" Grid.Row="1"
+			<Button Grid.Column="0"
                     x:Name="RefreshButton" 
                     Text="Refresh Info" 
                     TextColor="#2196F3"

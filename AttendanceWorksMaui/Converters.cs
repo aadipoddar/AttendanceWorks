@@ -7,9 +7,9 @@ namespace AttendanceWorksMaui
 	{
 		public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
 		{
-			if (value is bool present)
+			if (value is bool isPresent)
 			{
-				return present ? "Present" : "Absent";
+				return isPresent ? "Present" : "Absent";
 			}
 			return "Unknown";
 		}
@@ -24,9 +24,9 @@ namespace AttendanceWorksMaui
 	{
 		public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
 		{
-			if (value is bool present)
+			if (value is bool isPresent)
 			{
-				return present ? Color.FromArgb("#4CAF50") : Color.FromArgb("#F44336");
+				return isPresent ? Color.FromArgb("#4CAF50") : Color.FromArgb("#F44336");
 			}
 			return Colors.Gray;
 		}
@@ -41,12 +41,9 @@ namespace AttendanceWorksMaui
 	{
 		public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
 		{
-			if (value is bool present)
+			if (value is bool isPresent)
 			{
-				if (present)
-					return Application.Current.Resources["PresentBadgeStyle"];
-				else
-					return Application.Current.Resources["AbsentBadgeStyle"];
+				return isPresent ? "PresentBadgeStyle" : "AbsentBadgeStyle";
 			}
 			return null;
 		}

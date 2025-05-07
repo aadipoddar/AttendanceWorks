@@ -51,9 +51,6 @@ public partial class MainPage : ContentPage
 			ClassRoomLabel.Text = _currentClass.ClassroomName;
 			StatusLabel.Text = "ACTIVE";
 			StatusLabel.TextColor = Colors.Green;
-
-			// Enable mark attendance button
-			MarkAttendanceButton.IsEnabled = true;
 		}
 		else
 		{
@@ -63,9 +60,6 @@ public partial class MainPage : ContentPage
 			ClassRoomLabel.Text = "N/A";
 			StatusLabel.Text = "INACTIVE";
 			StatusLabel.TextColor = Color.FromArgb("#ff6b6b");
-
-			// Disable mark attendance button
-			MarkAttendanceButton.IsEnabled = false;
 		}
 
 		// Check if attendance is already marked
@@ -108,8 +102,6 @@ public partial class MainPage : ContentPage
 		{
 			AttendanceStatusLabel.Text = attendanceRecord.Present ? "Marked Present" : "Marked Absent";
 			AttendanceStatusLabel.TextColor = attendanceRecord.Present ? Colors.Green : Colors.Red;
-			MarkAttendanceButton.IsEnabled = false;
-			MarkAttendanceButton.Text = "Attendance Marked";
 		}
 		else
 		{
@@ -126,12 +118,10 @@ public partial class MainPage : ContentPage
 		{
 			LocationInfoLabel.Text = "Checking location permissions...";
 
-			var status = await Permissions.CheckStatusAsync<Permissions.LocationAlways>();
+			var status = await Permissions.CheckStatusAsync<Permissions.LocationWhenInUse>();
 
 			if (status != PermissionStatus.Granted)
-			{
-				status = await Permissions.RequestAsync<Permissions.LocationAlways>();
-			}
+				status = await Permissions.RequestAsync<Permissions.LocationWhenInUse>();
 
 			_locationPermissionGranted = (status == PermissionStatus.Granted);
 
@@ -144,7 +134,6 @@ public partial class MainPage : ContentPage
 			{
 				LocationStatusLabel.Text = "Not available";
 				LocationInfoLabel.Text = "Location permission denied. Cannot mark attendance.";
-				MarkAttendanceButton.IsEnabled = false;
 				await MarkAbsent();
 			}
 		}
@@ -191,8 +180,8 @@ public partial class MainPage : ContentPage
 							DistanceUnits.Kilometers);
 
 						DistanceLabel.Text = $"{differenceKilometeres:F3} km";
-						_isInClassRange = differenceKilometeres < 0.05;
-						//_isInClassRange = differenceKilometeres < 0.001;
+						//_isInClassRange = differenceKilometeres < 0.05;
+						_isInClassRange = differenceKilometeres < 0.001;
 					}
 					else
 					{
@@ -204,14 +193,12 @@ public partial class MainPage : ContentPage
 					if (_isInClassRange)
 					{
 						LocationInfoLabel.Text = "You are within class location range";
-						MarkAttendanceButton.IsEnabled = true && !_isAttendanceMarked;
 						await MarkAttendance();
 						NavigateToClassButton.IsVisible = false;
 					}
 					else
 					{
 						LocationInfoLabel.Text = "You are not in the classroom location";
-						MarkAttendanceButton.IsEnabled = false;
 						await MarkAbsent();
 						NavigateToClassButton.IsVisible = true;
 					}
@@ -229,7 +216,6 @@ public partial class MainPage : ContentPage
 				StudentCoordinatesLabel.Text = "Unknown";
 				DistanceLabel.Text = "Unknown";
 				LocationInfoLabel.Text = "Unable to determine your location";
-				MarkAttendanceButton.IsEnabled = false;
 				await MarkAbsent();
 			}
 		}
@@ -240,7 +226,6 @@ public partial class MainPage : ContentPage
 			StudentCoordinatesLabel.Text = "Error";
 			DistanceLabel.Text = "Error";
 			LocationInfoLabel.Text = "Error determining your location";
-			MarkAttendanceButton.IsEnabled = false;
 			await MarkAbsent();
 		}
 		finally
@@ -248,9 +233,6 @@ public partial class MainPage : ContentPage
 			_isCheckingLocation = false;
 		}
 	}
-
-	private async void MarkAttendanceButton_Clicked(object sender, EventArgs e) =>
-		await MarkAttendance();
 
 	private async Task MarkAttendance()
 	{
@@ -268,10 +250,6 @@ public partial class MainPage : ContentPage
 			return;
 		}
 
-		// Disable the button while processing
-		MarkAttendanceButton.IsEnabled = false;
-		MarkAttendanceButton.Text = "Processing...";
-
 		var existingAttendance = await AttendanceData.LoadAttendanceByScheduledClass(_currentClass.ScheduledClassId);
 		var attendanceRecord = existingAttendance.FirstOrDefault(a => a.StudentId == _student.Id);
 
@@ -279,8 +257,6 @@ public partial class MainPage : ContentPage
 		{
 			await DisplayAlert("Attendance Already Marked",
 				"Your attendance has already been marked by the Teacher.", "OK");
-
-			MarkAttendanceButton.IsEnabled = true;
 			return;
 		}
 
@@ -297,7 +273,6 @@ public partial class MainPage : ContentPage
 		// Update UI to show attendance marked
 		AttendanceStatusLabel.Text = "Marked Present";
 		AttendanceStatusLabel.TextColor = Colors.Green;
-		MarkAttendanceButton.Text = "Attendance Marked";
 
 		_isAttendanceMarked = true;
 	}
@@ -308,7 +283,7 @@ public partial class MainPage : ContentPage
 		RefreshButton.Text = "Refreshing...";
 
 		await RefreshClassInfo();
-		await GetCurrentLocation();
+		await CheckLocationPermission();
 
 		RefreshButton.IsEnabled = true;
 		RefreshButton.Text = "Refresh Class Info";
@@ -361,13 +336,8 @@ public partial class MainPage : ContentPage
 	{
 		var classRoom = await CommonData.LoadTableDataById<ClassRoomModel>(TableNames.ClassRoom, _currentClass.ClassroomId);
 		var location = new Location((double)classRoom.Latitude, (double)classRoom.Longitude);
-		var options = new MapLaunchOptions
-		{
-			Name = _currentClass.ClassroomName,
-			NavigationMode = NavigationMode.Driving
-		};
 
-		await Map.Default.OpenAsync(location, options);
+		await Navigation.PushAsync(new NavigateToClassPage(classRoom));
 	}
 
 	private async void LogoutButton_Clicked(object sender, EventArgs e)

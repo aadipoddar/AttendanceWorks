@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Logging;
+﻿#if DEBUG
+using Microsoft.Extensions.Logging;
+#endif
 
 namespace AttendanceWorksMaui;
 
@@ -12,6 +14,7 @@ public static class MauiProgram
 		var builder = MauiApp.CreateBuilder();
 		builder
 			.UseMauiApp<App>()
+			.UseMauiMaps()
 			.ConfigureFonts(fonts =>
 			{
 				fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
