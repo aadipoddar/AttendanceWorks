@@ -88,7 +88,6 @@
 		<MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#512BD4" BaseSize="128,128" />
 
 		<!-- Images -->
-		<MauiImage Include="Resources\Images\*" />
 
 		<!-- Custom Fonts -->
 		<MauiFont Include="Resources\Fonts\*" />
@@ -98,11 +97,19 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <AndroidResource Remove="Resources\Images\**" />
+	  <Compile Remove="Resources\Images\**" />
+	  <EmbeddedResource Remove="Resources\Images\**" />
+	  <MauiCss Remove="Resources\Images\**" />
+	  <MauiXaml Remove="Resources\Images\**" />
+	  <None Remove="Resources\Images\**" />
+	</ItemGroup>
+
+	<ItemGroup>
 	  <None Remove="Resources\Icons\attendance.png" />
 	  <None Remove="Resources\Icons\back.png" />
 	  <None Remove="Resources\Icons\hide.png" />
 	  <None Remove="Resources\Icons\layer.png" />
-	  <None Remove="Resources\Icons\layers.png" />
 	  <None Remove="Resources\Icons\lock.png" />
 	  <None Remove="Resources\Icons\user.png" />
 	  <None Remove="Resources\Icons\view.png" />
@@ -113,8 +120,6 @@
 	  <MauiImage Include="Resources\Icons\back.png" />
 	  <MauiImage Include="Resources\Icons\hide.png" />
 	  <MauiImage Include="Resources\Icons\layer.png" />
-	  <MauiImage Include="Resources\Icons\layerss.svg" />
-	  <MauiImage Include="Resources\Icons\layers.png" />
 	  <MauiImage Include="Resources\Icons\lock.png" />
 	  <MauiImage Include="Resources\Icons\no_data.png" />
 	  <MauiImage Include="Resources\Icons\user.png" />
@@ -150,10 +155,6 @@
 	  <Using Include="AttendanceWorksLibrary.DataAccess" />
 	  <Using Include="AttendanceWorksLibrary.Models" />
 	  <Using Include="AttendanceWorksLibrary.Utilities" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Folder Include="Resources\Images\" />
 	</ItemGroup>
 
 </Project>
