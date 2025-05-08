@@ -78,7 +78,7 @@
                         VerticalOptions="Start"
                         Margin="10,60">
 					<ImageButton x:Name="MapTypeButton"
-                            Source="layers.png"
+                            Source="layer.png"
 							MaximumHeightRequest="20"
 							MaximumWidthRequest="20"
                             BackgroundColor="Transparent"

@@ -22,11 +22,14 @@ public partial class NavigateToClassPage : ContentPage
 	{
 		base.OnAppearing();
 
-		// Update UI with classroom info
-		//ClassNameLabel.Text = $"Finding your way to {_classRoom.Name}";
+		LoadClassroomPin();
+		await CheckLocationPermission();
+	}
+
+	private void LoadClassroomPin()
+	{
 		ClassroomDetailLabel.Text = _classRoom.Name;
 
-		// Create classroom pin
 		Pin classroomPin = new()
 		{
 			Label = _classRoom.Name,
@@ -35,44 +38,37 @@ public partial class NavigateToClassPage : ContentPage
 			Location = new Location((double)_classRoom.Latitude, (double)_classRoom.Longitude)
 		};
 		map.Pins.Add(classroomPin);
-
-		// Check location permission and get current location
-		await CheckLocationPermissionAndGetLocation();
 	}
 
-	private async Task CheckLocationPermissionAndGetLocation()
+	private async Task CheckLocationPermission()
 	{
 		try
 		{
-			// Show loading indicators
 			DistanceDetailLabel.Text = "Checking location...";
 			ETADetailLabel.Text = "Checking location...";
 
 			var status = await Permissions.CheckStatusAsync<Permissions.LocationWhenInUse>();
 
 			if (status != PermissionStatus.Granted)
-			{
 				status = await Permissions.RequestAsync<Permissions.LocationWhenInUse>();
-			}
 
 			_locationPermissionGranted = status == PermissionStatus.Granted;
 
 			if (_locationPermissionGranted)
-			{
 				await GetCurrentLocation();
-			}
 			else
 			{
 				await DisplayAlert("Location Permission Required",
 					"Navigation requires access to your location. Please enable location services.", "OK");
 
-				// Center the map on classroom location only
 				map.MoveToRegion(MapSpan.FromCenterAndRadius(
 					new Location((double)_classRoom.Latitude, (double)_classRoom.Longitude),
 					Distance.FromKilometers(0.5)));
 
-				DistanceDetailLabel.Text = "Unknown";
-				ETADetailLabel.Text = "Unknown";
+				DistanceDetailLabel.Text = "Location Permission Denied";
+				ETADetailLabel.Text = "Location Permission Denied";
+				DistanceDetailLabel.TextColor = Colors.Red;
+				ETADetailLabel.TextColor = Colors.Red;
 			}
 		}
 		catch (Exception)
@@ -93,62 +89,31 @@ public partial class NavigateToClassPage : ContentPage
 
 			if (_studentLocation is not null)
 			{
-				// Add student location pin
-				Pin studentPin = new()
-				{
-					Label = "Your Location",
-					Type = PinType.Generic,
-					Location = _studentLocation
-				};
-				//map.Pins.Add(studentPin);
+				AddPolyLine();
 
-				// Get classroom location
 				var classroomLocation = new Location((double)_classRoom.Latitude, (double)_classRoom.Longitude);
 
-				// Draw a route line (polyline) between student and classroom
-				var routeCoordinates = new List<Location>
-				{
-					_studentLocation,
-					classroomLocation
-				};
-
-				var polyline = new Polyline
-				{
-					StrokeColor = Color.FromArgb("#4285F4"),  // Google Maps blue color
-					StrokeWidth = 6,
-				};
-
-				foreach (var position in routeCoordinates)
-				{
-					polyline.Geopath.Add(position);
-				}
-
-				map.MapElements.Add(polyline);
-
-				// Center map to include both points
-				map.MoveToRegion(MapSpan.FromCenterAndRadius(
-					new Location(
-						(_studentLocation.Latitude + (double)_classRoom.Latitude) / 2,
-						(_studentLocation.Longitude + (double)_classRoom.Longitude) / 2),
-					Distance.FromKilometers(
-						CalculateDistance(_studentLocation, classroomLocation) * 2)));
-
-				// Calculate and update distance
-				double distanceInKm = CalculateDistance(_studentLocation, classroomLocation);
-
+				double distanceInKm = Location.CalculateDistance(_studentLocation, classroomLocation, DistanceUnits.Kilometers);
 				DistanceDetailLabel.Text = $"{distanceInKm:F2} km";
 
-				// Estimate ETA (assuming average walking speed of 5 km/h)
+				map.MoveToRegion(MapSpan.FromCenterAndRadius(
+					new Location(
+							(_studentLocation.Latitude + (double)_classRoom.Latitude) / 2,
+							(_studentLocation.Longitude + (double)_classRoom.Longitude) / 2),
+					Distance.FromKilometers(distanceInKm * 2)));
+
+				// Estimate ETA (Walking speed = 5 km/h)
 				double timeInMinutes = distanceInKm / 5.0 * 60;
 				ETADetailLabel.Text = $"{timeInMinutes:F0} minutes (walking)";
 			}
 			else
 			{
 				await DisplayAlert("Location Not Found", "Unable to determine your current location.", "OK");
-				DistanceDetailLabel.Text = "Unknown";
-				ETADetailLabel.Text = "Unknown";
+				DistanceDetailLabel.Text = "Location Not Found";
+				ETADetailLabel.Text = "Location Not Found";
+				DistanceDetailLabel.TextColor = Colors.Red;
+				ETADetailLabel.TextColor = Colors.Red;
 
-				// Center the map on classroom location only
 				map.MoveToRegion(MapSpan.FromCenterAndRadius(
 					new Location((double)_classRoom.Latitude, (double)_classRoom.Longitude),
 					Distance.FromKilometers(0.5)));
@@ -157,8 +122,10 @@ public partial class NavigateToClassPage : ContentPage
 		catch (Exception)
 		{
 			await DisplayAlert("Location Error", "Error determining your location.", "OK");
-			DistanceDetailLabel.Text = "Error";
-			ETADetailLabel.Text = "Error";
+			DistanceDetailLabel.Text = "Location Error";
+			ETADetailLabel.Text = "Location Error";
+			DistanceDetailLabel.TextColor = Colors.Red;
+			ETADetailLabel.TextColor = Colors.Red;
 		}
 		finally
 		{
@@ -166,74 +133,21 @@ public partial class NavigateToClassPage : ContentPage
 		}
 	}
 
-	private static double CalculateDistance(Location loc1, Location loc2)
+	private void AddPolyLine()
 	{
-		return Location.CalculateDistance(loc1, loc2, DistanceUnits.Kilometers);
-	}
+		var classroomLocation = new Location((double)_classRoom.Latitude, (double)_classRoom.Longitude);
+		List<Location> routeCoordinates = [_studentLocation, classroomLocation];
 
-	private void ZoomInButton_Clicked(object sender, EventArgs e)
-	{
-		_zoomLevel = Math.Min(_zoomLevel + 1, 20);
-		UpdateMapZoom();
-	}
-
-	private void ZoomOutButton_Clicked(object sender, EventArgs e)
-	{
-		_zoomLevel = Math.Max(_zoomLevel - 1, 1);
-		UpdateMapZoom();
-	}
-
-	private void UpdateMapZoom()
-	{
-		var center = map.VisibleRegion?.Center;
-		if (center != null)
+		var polyline = new Polyline
 		{
-			map.MoveToRegion(MapSpan.FromCenterAndRadius(
-				center,
-				Distance.FromKilometers(20 / Math.Pow(2, _zoomLevel - 1))));
-		}
-	}
+			StrokeColor = Color.FromArgb("#4285F4"), // Google Maps blue color
+			StrokeWidth = 6,
+		};
 
-	private void RecenterButton_Clicked(object sender, EventArgs e)
-	{
-		if (_studentLocation != null && _classRoom != null)
-		{
-			var classroomLocation = new Location((double)_classRoom.Latitude, (double)_classRoom.Longitude);
+		foreach (var position in routeCoordinates)
+			polyline.Geopath.Add(position);
 
-			// Redraw route when recentering
-			var routeCoordinates = NavigateToClassPage.CreateSimplifiedRoute(_studentLocation, classroomLocation);
-
-			// Draw the route
-			var polyline = new Polyline
-			{
-				StrokeColor = Color.FromArgb("#4285F4"),
-				StrokeWidth = 6
-			};
-
-			foreach (var position in routeCoordinates)
-			{
-				polyline.Geopath.Add(position);
-			}
-
-			// Clear and add new route
-			map.MapElements.Clear();
-			map.MapElements.Add(polyline);
-
-			// Center map to include both points
-			map.MoveToRegion(MapSpan.FromCenterAndRadius(
-				new Location(
-					(_studentLocation.Latitude + (double)_classRoom.Latitude) / 2,
-					(_studentLocation.Longitude + (double)_classRoom.Longitude) / 2),
-				Distance.FromKilometers(
-					CalculateDistance(_studentLocation, classroomLocation) * 2)));
-		}
-		else if (_classRoom != null)
-		{
-			// If student location is not available, center on classroom
-			map.MoveToRegion(MapSpan.FromCenterAndRadius(
-				new Location((double)_classRoom.Latitude, (double)_classRoom.Longitude),
-				Distance.FromKilometers(0.5)));
-		}
+		map.MapElements.Add(polyline);
 	}
 
 	private void MapTypeButton_Clicked(object sender, EventArgs e)
@@ -249,7 +163,7 @@ public partial class NavigateToClassPage : ContentPage
 
 	private async void StartNavigationButton_Clicked(object sender, EventArgs e)
 	{
-		if (_classRoom != null)
+		if (_classRoom is not null)
 		{
 			var location = new Location((double)_classRoom.Latitude, (double)_classRoom.Longitude);
 			var options = new MapLaunchOptions
@@ -265,32 +179,8 @@ public partial class NavigateToClassPage : ContentPage
 	protected override void OnDisappearing()
 	{
 		if (_isCheckingLocation)
-		{
 			_cancelTokenSource?.Cancel();
-		}
+
 		base.OnDisappearing();
-	}
-	private static List<Location> CreateSimplifiedRoute(Location start, Location end)
-	{
-		var route = new List<Location> { start };
-
-		// Calculate midpoint with slight offset to make the route look more natural
-		// This simulates the route following roads rather than a straight line
-		double latMid = (start.Latitude + end.Latitude) / 2;
-		double lonMid = (start.Longitude + end.Longitude) / 2;
-
-		// Add slight randomness to make the path curve
-		// The 0.0001 factor can be adjusted based on the typical distance
-		double offsetFactor = 0.0001;
-		double latOffset = (start.Longitude - end.Longitude) * offsetFactor;
-		double lonOffset = (end.Latitude - start.Latitude) * offsetFactor;
-
-		// Create intermediary points for a more natural curve
-		route.Add(new Location(latMid + latOffset, lonMid + lonOffset));
-
-		// Add the destination
-		route.Add(end);
-
-		return route;
 	}
 }

@@ -101,6 +101,7 @@
 	  <None Remove="Resources\Icons\attendance.png" />
 	  <None Remove="Resources\Icons\back.png" />
 	  <None Remove="Resources\Icons\hide.png" />
+	  <None Remove="Resources\Icons\layer.png" />
 	  <None Remove="Resources\Icons\layers.png" />
 	  <None Remove="Resources\Icons\lock.png" />
 	  <None Remove="Resources\Icons\user.png" />
@@ -111,6 +112,8 @@
 	  <MauiImage Include="Resources\Icons\attendance.png" />
 	  <MauiImage Include="Resources\Icons\back.png" />
 	  <MauiImage Include="Resources\Icons\hide.png" />
+	  <MauiImage Include="Resources\Icons\layer.png" />
+	  <MauiImage Include="Resources\Icons\layerss.svg" />
 	  <MauiImage Include="Resources\Icons\layers.png" />
 	  <MauiImage Include="Resources\Icons\lock.png" />
 	  <MauiImage Include="Resources\Icons\no_data.png" />
