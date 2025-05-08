@@ -36,7 +36,6 @@
 			<Setter Property="Margin" Value="0,5,0,5"/>
 		</Style>
 
-		<!-- New style for navigation button container -->
 		<Style x:Key="NavigationButtonContainerStyle" TargetType="Border">
 			<Setter Property="Stroke" Value="Transparent"/>
 			<Setter Property="StrokeThickness" Value="0"/>

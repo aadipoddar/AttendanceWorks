@@ -8,7 +8,6 @@ public partial class NavigateToClassPage : ContentPage
 	private readonly ClassRoomModel _classRoom;
 	private Location _studentLocation;
 	private CancellationTokenSource _cancelTokenSource;
-	private double _zoomLevel = 16.0; // Default zoom level
 	private bool _isCheckingLocation;
 	private bool _locationPermissionGranted;
 
