@@ -68,6 +68,7 @@
     <Folder Include="StoredProcedure\LoadData\Attendance" />
     <Folder Include="Compares" />
     <Folder Include="StoredProcedure\Delete" />
+    <Folder Include="StoredProcedure\LoadData\Classes" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Tables\Student.sql" />
@@ -98,6 +99,8 @@
     <Build Include="StoredProcedure\LoadData\Student\Load_Student_Attendance.sql" />
     <Build Include="Views\View_AttendanceDetails.sql" />
     <Build Include="StoredProcedure\Delete\Delete_Attendance_By_ScheduledClass.sql" />
+    <Build Include="Views\View_ScheduleedClassDetails.sql" />
+    <Build Include="StoredProcedure\LoadData\Classes\Load_ScheduledClasseDetails_By_Section.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="DBAttendanceWorks.refactorlog" />

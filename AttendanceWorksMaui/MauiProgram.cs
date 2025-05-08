@@ -2,6 +2,8 @@
 using Microsoft.Extensions.Logging;
 #endif
 
+using Plugin.LocalNotification;
+
 namespace AttendanceWorksMaui;
 
 public static class MauiProgram
@@ -15,6 +17,21 @@ public static class MauiProgram
 		builder
 			.UseMauiApp<App>()
 			.UseMauiMaps()
+			.UseLocalNotification(config =>
+			{
+				config.AddCategory(new NotificationCategory(NotificationCategoryType.Status)
+				{
+					ActionList = [new(100)
+									{
+											Title = "Navigate To Class",
+											Android =
+											{
+												LaunchAppWhenTapped = true,
+												IconName = { ResourceName = "i2" }
+											}
+					}]
+				});
+			})
 			.ConfigureFonts(fonts =>
 			{
 				fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");

@@ -26,6 +26,8 @@ public static class StoredProcedureNames
 
 	public static string LoadAttendanceByScheduledClass => "Load_Attendance_By_ScheduledClass";
 
+	public static string LoadScheduledClasseDetailsBySection => "Load_ScheduledClasseDetails_By_Section";
+
 	public static string InsertStudent => "Insert_Student";
 	public static string InsertTeacher => "Insert_Teacher";
 	public static string InsertClassRoom => "Insert_ClassRoom";
@@ -42,4 +44,5 @@ public static class ViewNames
 {
 	public static string ViewActiveClasses => "View_ActiveClasses";
 	public static string ViewAttendanceDetails => "View_AttendanceDetails";
+	public static string ViewScheduleedClassDetails => "View_ScheduleedClassDetails";
 }

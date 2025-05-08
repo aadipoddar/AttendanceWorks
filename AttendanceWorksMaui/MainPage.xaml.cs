@@ -1,5 +1,8 @@
 ﻿using System.Diagnostics;
 
+using Plugin.LocalNotification;
+using Plugin.LocalNotification.EventArgs;
+
 namespace AttendanceWorksMaui;
 
 public partial class MainPage : ContentPage
@@ -16,6 +19,8 @@ public partial class MainPage : ContentPage
 	{
 		InitializeComponent();
 		_student = student;
+
+		LocalNotificationCenter.Current.NotificationActionTapped += Current_NotificationActionTapped;
 	}
 
 	private async void ContentPage_Loaded(object sender, EventArgs e)
@@ -23,6 +28,7 @@ public partial class MainPage : ContentPage
 		await LoadClassInfo();
 		await LoadAttendanceStats();
 		await CheckLocationPermission();
+		await CreateClassNotifications();
 	}
 
 	private async void RefreshButton_Clicked(object sender, EventArgs e)
@@ -135,9 +141,8 @@ public partial class MainPage : ContentPage
 				await MarkAbsent();
 			}
 		}
-		catch (Exception ex)
+		catch (Exception)
 		{
-			Debug.WriteLine($"Error checking location permission: {ex.Message}");
 			LocationInfoLabel.Text = "Error checking location permissions";
 			await MarkAbsent();
 		}
@@ -331,16 +336,100 @@ public partial class MainPage : ContentPage
 		await Navigation.PopAsync();
 	}
 
+	private void ViewScheduleButton_Clicked(object sender, EventArgs e)
+	{
+
+	}
+
 	protected override void OnDisappearing()
 	{
 		if (_isCheckingLocation)
 			_cancelTokenSource?.Cancel();
 
+		LocalNotificationCenter.Current.NotificationActionTapped -= Current_NotificationActionTapped;
+
 		base.OnDisappearing();
 	}
 
-	private void ViewScheduleButton_Clicked(object sender, EventArgs e)
+	private async void Current_NotificationActionTapped(NotificationActionEventArgs e)
 	{
+		if (e.ActionId == 100)
+		{
+			if (int.TryParse(e.Request.ReturningData, out int classroomId))
+			{
+				var classRoom = await CommonData.LoadTableDataById<ClassRoomModel>(TableNames.ClassRoom, classroomId);
+				if (classRoom is not null)
+				{
+					await Navigation.PushAsync(new NavigateToClassPage(classRoom));
+				}
+			}
+		}
+	}
 
+	private async Task CreateClassNotifications()
+	{
+		var status = await Permissions.CheckStatusAsync<Permissions.PostNotifications>();
+		if (status != PermissionStatus.Granted)
+			status = await Permissions.RequestAsync<Permissions.PostNotifications>();
+
+		if (status != PermissionStatus.Granted)
+		{
+			await DisplayAlert("Notification Permission",
+				"Unable to schedule notifications for classes without permission", "OK");
+			return;
+		}
+
+		var classes = await ScheduledClassData.LoadScheduledClasseDetailsBySection(_student.SectionId);
+		var fiveDaysFromNow = DateOnly.FromDateTime(DateTime.Today.AddDays(5));
+		classes = [.. classes.Where(c =>
+			(c.ClassDate >= DateOnly.FromDateTime(DateTime.Today) && c.ClassDate <= fiveDaysFromNow) ||
+			(c.ClassDate == DateOnly.FromDateTime(DateTime.Today) &&
+			 c.StartTime > TimeOnly.FromTimeSpan(DateTime.Now.TimeOfDay)))];
+
+
+		if (classes.Count == 0)
+			return;
+
+		LocalNotificationCenter.Current.CancelAll();
+
+		foreach (var classItem in classes)
+		{
+			var classDateTime = classItem.ClassDate.ToDateTime(classItem.StartTime);
+			var notificationTime = classDateTime.AddMinutes(-20);
+
+			if (classDateTime <= DateTime.Now)
+				continue;
+
+			var notification = new NotificationRequest
+			{
+				NotificationId = classItem.Id,
+				Title = $"Upcoming Class in 20 Minutes",
+				Subtitle = $"Classroom: {classItem.CourseCode}",
+				Description = $"You Have an Upcoming Class of {classItem.CourseName} in {classItem.ClassRoomName} at {classItem.StartTime:hh\\:mm tt}",
+				CategoryType = NotificationCategoryType.Status,
+				ReturningData = classItem.ClassRoomId.ToString(),
+				Schedule = new NotificationRequestSchedule
+				{
+					NotifyTime = classDateTime.AddMinutes(-20)
+				}
+			};
+
+			var startNotification = new NotificationRequest
+			{
+				NotificationId = classItem.Id + 10000,
+				Title = $"Class is Starting Now",
+				Subtitle = $"Classroom: {classItem.CourseCode}",
+				Description = $"You Class of {classItem.CourseName} is starting now in {classItem.ClassRoomName}",
+				CategoryType = NotificationCategoryType.Status,
+				ReturningData = classItem.ClassRoomId.ToString(),
+				Schedule = new NotificationRequestSchedule
+				{
+					NotifyTime = classDateTime
+				}
+			};
+
+			await LocalNotificationCenter.Current.Show(notification);
+			await LocalNotificationCenter.Current.Show(startNotification);
+		}
 	}
 }
