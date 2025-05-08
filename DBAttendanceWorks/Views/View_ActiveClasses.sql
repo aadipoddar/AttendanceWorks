@@ -22,9 +22,12 @@ FROM
     INNER JOIN [dbo].[Teacher] t ON cs.[TeacherId] = t.[Id]
     INNER JOIN [dbo].[ClassRoom] cr ON cs.[ClassRoomId] = cr.[Id]
 WHERE 
-    sc.[ClassDate] = CAST(GETDATE() AS DATE)
-    AND sc.[StartTime] <= CAST(GETDATE() AS TIME)
-    AND sc.[EndTime] > CAST(GETDATE() AS TIME)
+    sc.[ClassDate] = CAST(DATEADD(MINUTE, 330, GETUTCDATE()) AS DATE)
+    AND sc.[StartTime] <= CAST(DATEADD(MINUTE, 330, GETUTCDATE()) AS TIME)
+    AND sc.[EndTime] > CAST(DATEADD(MINUTE, 330, GETUTCDATE()) AS TIME)
+    --sc.[ClassDate] = CAST(GETDATE() AS DATE)
+    --AND sc.[StartTime] <= CAST(GETDATE() AS TIME)
+    --AND sc.[EndTime] > CAST(GETDATE() AS TIME)
     AND sc.[Status] = 1
     AND cs.[Status] = 1
     AND c.[Status] = 1

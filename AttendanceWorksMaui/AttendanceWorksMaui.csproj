@@ -102,10 +102,7 @@
 	  <None Remove="Resources\Icons\back.png" />
 	  <None Remove="Resources\Icons\hide.png" />
 	  <None Remove="Resources\Icons\layers.png" />
-	  <None Remove="Resources\Icons\location.png" />
 	  <None Remove="Resources\Icons\lock.png" />
-	  <None Remove="Resources\Icons\minus.png" />
-	  <None Remove="Resources\Icons\plus.png" />
 	  <None Remove="Resources\Icons\user.png" />
 	  <None Remove="Resources\Icons\view.png" />
 	</ItemGroup>
@@ -115,11 +112,8 @@
 	  <MauiImage Include="Resources\Icons\back.png" />
 	  <MauiImage Include="Resources\Icons\hide.png" />
 	  <MauiImage Include="Resources\Icons\layers.png" />
-	  <MauiImage Include="Resources\Icons\location.png" />
 	  <MauiImage Include="Resources\Icons\lock.png" />
-	  <MauiImage Include="Resources\Icons\minus.png" />
 	  <MauiImage Include="Resources\Icons\no_data.png" />
-	  <MauiImage Include="Resources\Icons\plus.png" />
 	  <MauiImage Include="Resources\Icons\user.png" />
 	  <MauiImage Include="Resources\Icons\view.png" />
 	</ItemGroup>

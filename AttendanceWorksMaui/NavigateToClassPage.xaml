@@ -6,222 +6,151 @@
              Title="Navigate To Class"
              BackgroundColor="{AppThemeBinding Light=White, Dark=#1A1A1A}">
 
-    <ContentPage.Resources>
-        <Style x:Key="CardBorderStyle" TargetType="Border">
-            <Setter Property="Stroke" Value="{AppThemeBinding Light=#EEEEEE, Dark=#404040}"/>
-            <Setter Property="StrokeThickness" Value="1"/>
-            <Setter Property="StrokeShape" Value="RoundRectangle 15"/>
-            <Setter Property="BackgroundColor" Value="{AppThemeBinding Light=White, Dark=#252525}"/>
-            <Setter Property="Padding" Value="20"/>
-            <Setter Property="Shadow">
-                <Setter.Value>
-                    <Shadow Brush="Black" Offset="0,5" Radius="10" Opacity="0.1"/>
-                </Setter.Value>
-            </Setter>
-        </Style>
+	<ContentPage.Resources>
+		<Style x:Key="CardBorderStyle" TargetType="Border">
+			<Setter Property="Stroke" Value="{AppThemeBinding Light=#EEEEEE, Dark=#404040}"/>
+			<Setter Property="StrokeThickness" Value="1"/>
+			<Setter Property="StrokeShape" Value="RoundRectangle 15"/>
+			<Setter Property="BackgroundColor" Value="{AppThemeBinding Light=White, Dark=#252525}"/>
+			<Setter Property="Padding" Value="20"/>
+			<Setter Property="Shadow">
+				<Setter.Value>
+					<Shadow Brush="Black" Offset="0,5" Radius="10" Opacity="0.1"/>
+				</Setter.Value>
+			</Setter>
+		</Style>
 
-        <Style x:Key="CardHeaderStyle" TargetType="Label">
-            <Setter Property="FontSize" Value="14"/>
-            <Setter Property="TextColor" Value="{AppThemeBinding Light=#444444, Dark=#BBBBBB}"/>
-            <Setter Property="FontAttributes" Value="Bold"/>
-            <Setter Property="Margin" Value="0,0,0,5"/>
-        </Style>
+		<Style x:Key="CardHeaderStyle" TargetType="Label">
+			<Setter Property="FontSize" Value="14"/>
+			<Setter Property="TextColor" Value="{AppThemeBinding Light=#444444, Dark=#BBBBBB}"/>
+			<Setter Property="FontAttributes" Value="Bold"/>
+			<Setter Property="Margin" Value="0,0,0,5"/>
+		</Style>
 
-        <Style x:Key="PrimaryButtonStyle" TargetType="Button">
-            <Setter Property="TextColor" Value="White"/>
-            <Setter Property="FontAttributes" Value="Bold"/>
-            <Setter Property="FontSize" Value="16"/>
-            <Setter Property="HeightRequest" Value="50"/>
-            <Setter Property="CornerRadius" Value="25"/>
-            <Setter Property="Margin" Value="0,5,0,5"/>
-            <!-- Remove the shadow from the style as we'll use a Border for better control -->
-        </Style>
-        
-        <!-- New style for navigation button container -->
-        <Style x:Key="NavigationButtonContainerStyle" TargetType="Border">
-            <Setter Property="Stroke" Value="Transparent"/>
-            <Setter Property="StrokeThickness" Value="0"/>
-            <Setter Property="StrokeShape" Value="RoundRectangle 25"/>
-            <Setter Property="Padding" Value="0"/>
-            <Setter Property="Margin" Value="0,20,0,0"/>
-            <Setter Property="Shadow">
-                <Setter.Value>
-                    <Shadow Brush="#30000000" Offset="0,3" Radius="6" Opacity="0.3"/>
-                </Setter.Value>
-            </Setter>
-        </Style>
-    </ContentPage.Resources>
+		<Style x:Key="PrimaryButtonStyle" TargetType="Button">
+			<Setter Property="TextColor" Value="White"/>
+			<Setter Property="FontAttributes" Value="Bold"/>
+			<Setter Property="FontSize" Value="16"/>
+			<Setter Property="HeightRequest" Value="50"/>
+			<Setter Property="CornerRadius" Value="25"/>
+			<Setter Property="Margin" Value="0,5,0,5"/>
+		</Style>
 
-    <Grid RowDefinitions="Auto, *, Auto">
-        <!-- Header with Gradient Background -->
-        <BoxView Grid.Row="0"
-                 HeightRequest="120"
-                 VerticalOptions="Start">
-            <BoxView.Background>
-                <LinearGradientBrush StartPoint="0,0"
-                                      EndPoint="1,1">
-                    <GradientStop Color="#4CAF50"
-                                  Offset="0.1"/>
-                    <GradientStop Color="#2196F3"
-                                  Offset="0.9"/>
-                </LinearGradientBrush>
-            </BoxView.Background>
-        </BoxView>
+		<!-- New style for navigation button container -->
+		<Style x:Key="NavigationButtonContainerStyle" TargetType="Border">
+			<Setter Property="Stroke" Value="Transparent"/>
+			<Setter Property="StrokeThickness" Value="0"/>
+			<Setter Property="StrokeShape" Value="RoundRectangle 25"/>
+			<Setter Property="Padding" Value="0"/>
+			<Setter Property="Margin" Value="0,20,0,0"/>
+			<Setter Property="Shadow">
+				<Setter.Value>
+					<Shadow Brush="#30000000" Offset="0,3" Radius="6" Opacity="0.3"/>
+				</Setter.Value>
+			</Setter>
+		</Style>
+	</ContentPage.Resources>
 
-        <!-- Header Content -->
-        <VerticalStackLayout Grid.Row="0" 
-                             Padding="20,20,20,15" 
-                             Spacing="5">
-            <Label Text="CLASSROOM NAVIGATION"
-                   FontSize="22" 
-                   FontAttributes="Bold"
-                   TextColor="White"/>
-            <Label x:Name="ClassNameLabel" 
-                   Text="Finding your way to class..." 
-                   FontSize="16" 
-                   TextColor="#E0E0E0"/>
-        </VerticalStackLayout>
+	<Grid RowDefinitions="*, Auto">
+		<!-- Map Section -->
+		<Border StrokeShape="RoundRectangle 15"
+                Margin="15,15,15,5"
+                Stroke="{AppThemeBinding Light=#e0e0e0, Dark=#404040}"
+                StrokeThickness="1">
+			<Border.Shadow>
+				<Shadow Brush="Black" Offset="0,3" Radius="8" Opacity="0.15"/>
+			</Border.Shadow>
 
-        <!-- Map Section -->
-        <Grid Grid.Row="1">
-            <maps:Map x:Name="map" 
-                      IsShowingUser="True" 
-                      IsTrafficEnabled="True"
-                      MapType="Street"/>
-            
-            <!-- Map Controls Overlay -->
-            <VerticalStackLayout HorizontalOptions="End" 
-                                VerticalOptions="Start"
-                                Margin="0,20,20,0"
-                                Spacing="10">
-                <Border StrokeShape="RoundRectangle 30"
-                        HeightRequest="60"
-                        WidthRequest="60"
-                        BackgroundColor="{AppThemeBinding Light=White, Dark=#252525}"
-                        Stroke="{AppThemeBinding Light=#EEEEEE, Dark=#404040}"
-                        StrokeThickness="1">
-                    <Border.Shadow>
-                        <Shadow Brush="Black" Offset="0,2" Radius="4" Opacity="0.2"/>
-                    </Border.Shadow>
-                    <ImageButton x:Name="ZoomInButton"
-                                Source="plus.png"
-                                HeightRequest="30"
-                                WidthRequest="30"
-                                BackgroundColor="Transparent"
-                                Clicked="ZoomInButton_Clicked"/>
-                </Border>
-                
-                <Border StrokeShape="RoundRectangle 30"
-                        HeightRequest="60"
-                        WidthRequest="60"
-                        BackgroundColor="{AppThemeBinding Light=White, Dark=#252525}"
-                        Stroke="{AppThemeBinding Light=#EEEEEE, Dark=#404040}"
-                        StrokeThickness="1">
-                    <Border.Shadow>
-                        <Shadow Brush="Black" Offset="0,2" Radius="4" Opacity="0.2"/>
-                    </Border.Shadow>
-                    <ImageButton x:Name="ZoomOutButton"
-                                Source="minus.png"
-                                HeightRequest="30"
-                                WidthRequest="30"
-                                BackgroundColor="Transparent"
-                                Clicked="ZoomOutButton_Clicked"/>
-                </Border>
-                
-                <Border StrokeShape="RoundRectangle 30"
-                        HeightRequest="60"
-                        WidthRequest="60"
-                        BackgroundColor="{AppThemeBinding Light=White, Dark=#252525}"
-                        Stroke="{AppThemeBinding Light=#EEEEEE, Dark=#404040}"
-                        StrokeThickness="1">
-                    <Border.Shadow>
-                        <Shadow Brush="Black" Offset="0,2" Radius="4" Opacity="0.2"/>
-                    </Border.Shadow>
-                    <ImageButton x:Name="RecenterButton"
-                                Source="location.png"
-                                HeightRequest="30"
-                                WidthRequest="30"
-                                BackgroundColor="Transparent"
-                                Clicked="RecenterButton_Clicked"/>
-                </Border>
-                
-                <Border StrokeShape="RoundRectangle 30"
-                        HeightRequest="60"
-                        WidthRequest="60"
-                        BackgroundColor="{AppThemeBinding Light=White, Dark=#252525}"
-                        Stroke="{AppThemeBinding Light=#EEEEEE, Dark=#404040}"
-                        StrokeThickness="1">
-                    <Border.Shadow>
-                        <Shadow Brush="Black" Offset="0,2" Radius="4" Opacity="0.2"/>
-                    </Border.Shadow>
-                    <ImageButton x:Name="MapTypeButton"
-                                Source="layers.png"
-                                HeightRequest="30"
-                                WidthRequest="30"
-                                BackgroundColor="Transparent"
-                                Clicked="MapTypeButton_Clicked"/>
-                </Border>
-            </VerticalStackLayout>
-        </Grid>
-        
-        <!-- Bottom Info Card -->
-        <Border Grid.Row="2"
+			<Grid>
+				<maps:Map x:Name="map" 
+                          IsShowingUser="True" 
+                          IsTrafficEnabled="True"
+                          IsScrollEnabled="True"
+                          IsZoomEnabled="True"
+                          MapType="Street"/>
+
+				<Border MinimumHeightRequest="40"
+						MinimumWidthRequest="40"
+						Background="WhiteSmoke"
+						Opacity="0.7"
+						Stroke="Transparent"
+						HorizontalOptions="End" 
+                        VerticalOptions="Start"
+                        Margin="10,60">
+					<ImageButton x:Name="MapTypeButton"
+                            Source="layers.png"
+							MaximumHeightRequest="20"
+							MaximumWidthRequest="20"
+                            BackgroundColor="Transparent"
+                            Clicked="MapTypeButton_Clicked"/>
+				</Border>
+			</Grid>
+		</Border>
+
+		<!-- Bottom Info Card -->
+		<Border Grid.Row="1"
                 Style="{StaticResource CardBorderStyle}"
-                Margin="15,0,15,15">
-            <Grid RowDefinitions="Auto, Auto, Auto, Auto" 
+                Margin="15">
+			<Grid RowDefinitions="Auto, Auto, Auto, Auto" 
                   ColumnDefinitions="Auto, *">
-                <!-- Classroom Info -->
-                <Label Grid.Row="0" Grid.Column="0"
+				<!-- Classroom Info -->
+				<Label Grid.Row="0" Grid.Column="0"
                        Text="Classroom:"
                        FontAttributes="Bold"
                        TextColor="{AppThemeBinding Light=#555555, Dark=#BBBBBB}"/>
-                <Label Grid.Row="0" Grid.Column="1"
+				<Label Grid.Row="0" Grid.Column="1"
                        x:Name="ClassroomDetailLabel"
                        Text="Loading..."
                        Margin="10,0,0,0"
+					   FontSize="16"
+					   HorizontalOptions="End"
                        TextColor="{AppThemeBinding Light=#333333, Dark=White}"/>
-                
-                <!-- Distance Info -->
-                <Label Grid.Row="1" Grid.Column="0"
+
+				<!-- Distance Info -->
+				<Label Grid.Row="1" Grid.Column="0"
                        Text="Distance:"
                        FontAttributes="Bold"
                        TextColor="{AppThemeBinding Light=#555555, Dark=#BBBBBB}"
                        Margin="0,10,0,0"/>
-                <Label Grid.Row="1" Grid.Column="1"
+				<Label Grid.Row="1" Grid.Column="1"
                        x:Name="DistanceDetailLabel"
                        Text="Calculating..."
                        Margin="10,10,0,0"
+					   FontSize="16"
+					   HorizontalOptions="End"
                        TextColor="{AppThemeBinding Light=#333333, Dark=White}"/>
-                
-                <!-- ETA Info -->
-                <Label Grid.Row="2" Grid.Column="0"
+
+				<!-- ETA Info -->
+				<Label Grid.Row="2" Grid.Column="0"
                        Text="ETA:"
                        FontAttributes="Bold"
                        TextColor="{AppThemeBinding Light=#555555, Dark=#BBBBBB}"
                        Margin="0,10,0,0"/>
-                <Label Grid.Row="2" Grid.Column="1"
+				<Label Grid.Row="2" Grid.Column="1"
                        x:Name="ETADetailLabel"
                        Text="Calculating..."
                        Margin="10,10,0,0"
+					   FontSize="16"
+					   HorizontalOptions="End"
                        TextColor="{AppThemeBinding Light=#333333, Dark=White}"/>
-                
-                <!-- Main Navigation Button - Improved design with subtle shadow -->
-                <Border Grid.Row="3" Grid.ColumnSpan="2"
+
+				<!-- Main Navigation Button -->
+				<Border Grid.Row="3" Grid.ColumnSpan="2"
                        Style="{StaticResource NavigationButtonContainerStyle}">
-                    <Button x:Name="StartNavigationButton"
+					<Button x:Name="StartNavigationButton"
                            Text="Start Navigation"
                            Style="{StaticResource PrimaryButtonStyle}"
                            Margin="0"
                            Clicked="StartNavigationButton_Clicked">
-                        <Button.Background>
-                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                <GradientStop Color="#5c6bc0" Offset="0.1"/>
-                                <GradientStop Color="#3949ab" Offset="0.9"/>
-                            </LinearGradientBrush>
-                        </Button.Background>
-                    </Button>
-                </Border>
-            </Grid>
-        </Border>
-    </Grid>
+						<Button.Background>
+							<LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+								<GradientStop Color="#5c6bc0" Offset="0.1"/>
+								<GradientStop Color="#3949ab" Offset="0.9"/>
+							</LinearGradientBrush>
+						</Button.Background>
+					</Button>
+				</Border>
+			</Grid>
+		</Border>
+	</Grid>
 </ContentPage>

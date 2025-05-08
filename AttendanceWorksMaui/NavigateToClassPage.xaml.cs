@@ -7,8 +7,8 @@ public partial class NavigateToClassPage : ContentPage
 {
 	private readonly ClassRoomModel _classRoom;
 	private Location _studentLocation;
-	private double _zoomLevel = 16.0; // Default zoom level
 	private CancellationTokenSource _cancelTokenSource;
+	private double _zoomLevel = 16.0; // Default zoom level
 	private bool _isCheckingLocation;
 	private bool _locationPermissionGranted;
 
@@ -23,7 +23,7 @@ public partial class NavigateToClassPage : ContentPage
 		base.OnAppearing();
 
 		// Update UI with classroom info
-		ClassNameLabel.Text = $"Finding your way to {_classRoom.Name}";
+		//ClassNameLabel.Text = $"Finding your way to {_classRoom.Name}";
 		ClassroomDetailLabel.Text = _classRoom.Name;
 
 		// Create classroom pin
@@ -55,7 +55,7 @@ public partial class NavigateToClassPage : ContentPage
 				status = await Permissions.RequestAsync<Permissions.LocationWhenInUse>();
 			}
 
-			_locationPermissionGranted = (status == PermissionStatus.Granted);
+			_locationPermissionGranted = status == PermissionStatus.Granted;
 
 			if (_locationPermissionGranted)
 			{
@@ -75,7 +75,7 @@ public partial class NavigateToClassPage : ContentPage
 				ETADetailLabel.Text = "Unknown";
 			}
 		}
-		catch (Exception ex)
+		catch (Exception)
 		{
 			await DisplayAlert("Location Error", "Unable to access location services.", "OK");
 		}
@@ -91,7 +91,7 @@ public partial class NavigateToClassPage : ContentPage
 			var request = new GeolocationRequest(GeolocationAccuracy.Best);
 			_studentLocation = await Geolocation.GetLocationAsync(request, _cancelTokenSource.Token);
 
-			if (_studentLocation != null)
+			if (_studentLocation is not null)
 			{
 				// Add student location pin
 				Pin studentPin = new()
@@ -100,7 +100,7 @@ public partial class NavigateToClassPage : ContentPage
 					Type = PinType.Generic,
 					Location = _studentLocation
 				};
-				map.Pins.Add(studentPin);
+				//map.Pins.Add(studentPin);
 
 				// Get classroom location
 				var classroomLocation = new Location((double)_classRoom.Latitude, (double)_classRoom.Longitude);
@@ -139,7 +139,7 @@ public partial class NavigateToClassPage : ContentPage
 				DistanceDetailLabel.Text = $"{distanceInKm:F2} km";
 
 				// Estimate ETA (assuming average walking speed of 5 km/h)
-				double timeInMinutes = (distanceInKm / 5.0) * 60;
+				double timeInMinutes = distanceInKm / 5.0 * 60;
 				ETADetailLabel.Text = $"{timeInMinutes:F0} minutes (walking)";
 			}
 			else
@@ -154,7 +154,7 @@ public partial class NavigateToClassPage : ContentPage
 					Distance.FromKilometers(0.5)));
 			}
 		}
-		catch (Exception ex)
+		catch (Exception)
 		{
 			await DisplayAlert("Location Error", "Error determining your location.", "OK");
 			DistanceDetailLabel.Text = "Error";

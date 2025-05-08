@@ -73,7 +73,7 @@ public partial class AttendanceReportWindow : ContentPage
 		int totalClasses = records.Count;
 		int presentCount = records.Count(r => r.Present);
 		int absentCount = totalClasses - presentCount;
-		double attendanceRate = totalClasses > 0 ? ((double)presentCount / totalClasses) * 100 : 0;
+		double attendanceRate = totalClasses > 0 ? (double)presentCount / totalClasses * 100 : 0;
 
 		TotalClassesLabel.Text = totalClasses.ToString();
 		PresentCountLabel.Text = presentCount.ToString();

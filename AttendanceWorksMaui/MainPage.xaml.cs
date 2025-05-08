@@ -6,10 +6,10 @@ public partial class MainPage : ContentPage
 {
 	private readonly StudentModel _student;
 	private ActiveClassModel _currentClass;
+	private CancellationTokenSource _cancelTokenSource;
 	private bool _locationPermissionGranted;
 	private bool _isInClassRange;
 	private bool _isAttendanceMarked;
-	private CancellationTokenSource _cancelTokenSource;
 	private bool _isCheckingLocation;
 
 	public MainPage(StudentModel student)
@@ -18,28 +18,31 @@ public partial class MainPage : ContentPage
 		_student = student;
 	}
 
-	protected override async void OnAppearing()
+	private async void ContentPage_Loaded(object sender, EventArgs e)
 	{
-		base.OnAppearing();
-
-		// Initialize UI with current date
-		DateLabel.Text = DateTime.Now.ToString("MMMM d, yyyy");
-		WelcomeLabel.Text = $"Hello, {_student.Name} ({_student.Roll})";
-
-		// Check for active classes
-		await RefreshClassInfo();
-		await RefreshStudentAttendance();
-
-		// Check location permissions
+		await LoadClassInfo();
+		await LoadAttendanceStats();
 		await CheckLocationPermission();
 	}
 
-	private async Task RefreshClassInfo()
+	private async void RefreshButton_Clicked(object sender, EventArgs e)
 	{
-		// Show loading state
+		RefreshButton.IsEnabled = false;
+		RefreshButton.Text = "Refreshing...";
+
+		await LoadClassInfo();
+		await CheckLocationPermission();
+
+		RefreshButton.IsEnabled = true;
+		RefreshButton.Text = "Refresh Class Info";
+	}
+
+	private async Task LoadClassInfo()
+	{
+		DateLabel.Text = DateTime.Now.ToString("MMMM d, yyyy");
+		WelcomeLabel.Text = $"Hello, {_student.Name} ({_student.Roll})";
+
 		CurrentClassLabel.Text = "Checking for active classes...";
-		StatusLabel.Text = "CHECKING";
-		StatusLabel.TextColor = Colors.Orange;
 
 		var activeClasses = await CommonData.LoadTableData<ActiveClassModel>(ViewNames.ViewActiveClasses);
 		_currentClass = activeClasses.Where(x => x.SectionId == _student.SectionId).FirstOrDefault();
@@ -49,8 +52,6 @@ public partial class MainPage : ContentPage
 			CurrentClassLabel.Text = $"{_currentClass.CourseCode}: {_currentClass.CourseName}";
 			ClassTimeLabel.Text = $"{_currentClass.StartTime:hh\\:mm tt} - {_currentClass.EndTime:hh\\:mm tt}";
 			ClassRoomLabel.Text = _currentClass.ClassroomName;
-			StatusLabel.Text = "ACTIVE";
-			StatusLabel.TextColor = Colors.Green;
 		}
 		else
 		{
@@ -58,30 +59,9 @@ public partial class MainPage : ContentPage
 			CurrentClassLabel.Text = "No active class";
 			ClassTimeLabel.Text = "N/A";
 			ClassRoomLabel.Text = "N/A";
-			StatusLabel.Text = "INACTIVE";
-			StatusLabel.TextColor = Color.FromArgb("#ff6b6b");
 		}
 
-		// Check if attendance is already marked
 		await CheckAttendanceStatus();
-	}
-
-	private async Task RefreshStudentAttendance()
-	{
-		var studentAttendance = await StudentData.LoadStudentAttendance(_student.Id);
-		if (studentAttendance is not null)
-		{
-			var presentPercentage = (double)studentAttendance.Count(a => a.Present) / studentAttendance.Count * 100;
-			var absentPercentage = (double)studentAttendance.Count(a => !a.Present) / studentAttendance.Count * 100;
-
-			var lateCount = studentAttendance.Count(a =>
-				(a.EntryTime.TimeOfDay - a.StartTime.ToTimeSpan()).TotalMinutes > 5);
-			var latePercentage = (double)lateCount / studentAttendance.Count * 100;
-
-			presentPercentLabel.Text = $"{presentPercentage:F2}%";
-			absentPercentLabel.Text = $"{absentPercentage:F2}%";
-			latePercentLabel.Text = $"{latePercentage:F2}%";
-		}
 	}
 
 	private async Task CheckAttendanceStatus()
@@ -112,6 +92,24 @@ public partial class MainPage : ContentPage
 		}
 	}
 
+	private async Task LoadAttendanceStats()
+	{
+		var studentAttendance = await StudentData.LoadStudentAttendance(_student.Id);
+		if (studentAttendance is not null)
+		{
+			var presentPercentage = (double)studentAttendance.Count(a => a.Present) / studentAttendance.Count * 100;
+			var absentPercentage = (double)studentAttendance.Count(a => !a.Present) / studentAttendance.Count * 100;
+
+			var lateCount = studentAttendance.Count(a =>
+				(a.EntryTime.TimeOfDay - a.StartTime.ToTimeSpan()).TotalMinutes > 5);
+			var latePercentage = (double)lateCount / studentAttendance.Count * 100;
+
+			presentPercentLabel.Text = $"{presentPercentage:F2}%";
+			absentPercentLabel.Text = $"{absentPercentage:F2}%";
+			latePercentLabel.Text = $"{latePercentage:F2}%";
+		}
+	}
+
 	private async Task CheckLocationPermission()
 	{
 		try
@@ -123,7 +121,7 @@ public partial class MainPage : ContentPage
 			if (status != PermissionStatus.Granted)
 				status = await Permissions.RequestAsync<Permissions.LocationWhenInUse>();
 
-			_locationPermissionGranted = (status == PermissionStatus.Granted);
+			_locationPermissionGranted = status == PermissionStatus.Granted;
 
 			if (_locationPermissionGranted)
 			{
@@ -157,15 +155,18 @@ public partial class MainPage : ContentPage
 			ClassCoordinatesLabel.Text = "Unknown";
 			DistanceLabel.Text = "Calculating...";
 
+			LocationStatusLabel.TextColor = Colors.Orange;
+			DistanceLabel.TextColor = Colors.Orange;
+
 			var request = new GeolocationRequest(GeolocationAccuracy.Best);
 			var location = await Geolocation.GetLocationAsync(request, _cancelTokenSource.Token);
 
 			if (location is not null)
 			{
 				LocationStatusLabel.Text = "Available";
+				LocationStatusLabel.TextColor = Color.FromRgba("#C8A2C8");
 				StudentCoordinatesLabel.Text = $"Lat: {location.Latitude:F6}, Long: {location.Longitude:F6}";
 
-				// Check if student is in range of classroom
 				if (_currentClass is not null)
 				{
 					var classRoom = await CommonData.LoadTableDataById<ClassRoomModel>(TableNames.ClassRoom, _currentClass.ClassroomId);
@@ -180,8 +181,8 @@ public partial class MainPage : ContentPage
 							DistanceUnits.Kilometers);
 
 						DistanceLabel.Text = $"{differenceKilometeres:F3} km";
-						//_isInClassRange = differenceKilometeres < 0.05;
-						_isInClassRange = differenceKilometeres < 0.001;
+						_isInClassRange = differenceKilometeres < 0.05;
+						//_isInClassRange = differenceKilometeres < 0.001;
 					}
 					else
 					{
@@ -193,12 +194,14 @@ public partial class MainPage : ContentPage
 					if (_isInClassRange)
 					{
 						LocationInfoLabel.Text = "You are within class location range";
+						LocationInfoLabel.TextColor = Colors.Green;
 						await MarkAttendance();
 						NavigateToClassButton.IsVisible = false;
 					}
 					else
 					{
 						LocationInfoLabel.Text = "You are not in the classroom location";
+						LocationInfoLabel.TextColor = Colors.IndianRed;
 						await MarkAbsent();
 						NavigateToClassButton.IsVisible = true;
 					}
@@ -270,31 +273,10 @@ public partial class MainPage : ContentPage
 			MarkedBy = null
 		});
 
-		// Update UI to show attendance marked
 		AttendanceStatusLabel.Text = "Marked Present";
 		AttendanceStatusLabel.TextColor = Colors.Green;
 
 		_isAttendanceMarked = true;
-	}
-
-	private async void RefreshButton_Clicked(object sender, EventArgs e)
-	{
-		RefreshButton.IsEnabled = false;
-		RefreshButton.Text = "Refreshing...";
-
-		await RefreshClassInfo();
-		await CheckLocationPermission();
-
-		RefreshButton.IsEnabled = true;
-		RefreshButton.Text = "Refresh Class Info";
-	}
-
-	protected override void OnDisappearing()
-	{
-		if (_isCheckingLocation)
-			_cancelTokenSource?.Cancel();
-
-		base.OnDisappearing();
 	}
 
 	private async Task MarkAbsent()
@@ -317,7 +299,7 @@ public partial class MainPage : ContentPage
 			});
 
 			AttendanceStatusLabel.Text = "Marked Absent";
-			AttendanceStatusLabel.TextColor = Color.FromArgb("#ff9900");
+			AttendanceStatusLabel.TextColor = Colors.Red;
 		}
 	}
 
@@ -335,10 +317,11 @@ public partial class MainPage : ContentPage
 	private async void NavigateToClassButton_Clicked(object sender, EventArgs e)
 	{
 		var classRoom = await CommonData.LoadTableDataById<ClassRoomModel>(TableNames.ClassRoom, _currentClass.ClassroomId);
-		var location = new Location((double)classRoom.Latitude, (double)classRoom.Longitude);
-
 		await Navigation.PushAsync(new NavigateToClassPage(classRoom));
 	}
+
+	private async void ViewHistoryButton_Clicked(object sender, EventArgs e) =>
+		await Navigation.PushAsync(new AttendanceReportWindow(_student));
 
 	private async void LogoutButton_Clicked(object sender, EventArgs e)
 	{
@@ -348,8 +331,16 @@ public partial class MainPage : ContentPage
 		await Navigation.PopAsync();
 	}
 
-	private void ViewHistoryButton_Clicked(object sender, EventArgs e)
+	protected override void OnDisappearing()
 	{
-		Navigation.PushAsync(new AttendanceReportWindow(_student));
+		if (_isCheckingLocation)
+			_cancelTokenSource?.Cancel();
+
+		base.OnDisappearing();
+	}
+
+	private void ViewScheduleButton_Clicked(object sender, EventArgs e)
+	{
+
 	}
 }
