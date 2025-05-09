@@ -7,7 +7,6 @@ public static class TableNames
 	public static string ClassRoom => "ClassRoom";
 	public static string Course => "Course";
 	public static string Section => "Section";
-	public static string CourseSection => "CourseSection";
 	public static string ScheduledClass => "ScheduledClass";
 	public static string Attendance => "Attendance";
 }
@@ -33,7 +32,6 @@ public static class StoredProcedureNames
 	public static string InsertClassRoom => "Insert_ClassRoom";
 	public static string InsertCourse => "Insert_Course";
 	public static string InsertSection => "Insert_Section";
-	public static string InsertCourseSection => "Insert_CourseSection";
 	public static string InsertScheduledClass => "Insert_ScheduledClass";
 	public static string InsertAttendance => "Insert_Attendance";
 
@@ -44,5 +42,5 @@ public static class ViewNames
 {
 	public static string ViewActiveClasses => "View_ActiveClasses";
 	public static string ViewAttendanceDetails => "View_AttendanceDetails";
-	public static string ViewScheduleedClassDetails => "View_ScheduleedClassDetails";
+	public static string ViewScheduledClassDetails => "View_ScheduledClassDetails";
 }

@@ -8,4 +8,5 @@ BEGIN
 		[dbo].[Student]
 	WHERE
 		[Email] = @Email
+		AND [Status] = 1
 END

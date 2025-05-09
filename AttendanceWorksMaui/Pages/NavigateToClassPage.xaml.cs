@@ -1,7 +1,7 @@
 using Microsoft.Maui.Controls.Maps;
 using Microsoft.Maui.Maps;
 
-namespace AttendanceWorksMaui;
+namespace AttendanceWorksMaui.Pages;
 
 public partial class NavigateToClassPage : ContentPage
 {

@@ -97,15 +97,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <AndroidResource Remove="Resources\Images\**" />
-	  <Compile Remove="Resources\Images\**" />
-	  <EmbeddedResource Remove="Resources\Images\**" />
-	  <MauiCss Remove="Resources\Images\**" />
-	  <MauiXaml Remove="Resources\Images\**" />
-	  <None Remove="Resources\Images\**" />
-	</ItemGroup>
-
-	<ItemGroup>
 	  <None Remove="Resources\Icons\attendance.png" />
 	  <None Remove="Resources\Icons\back.png" />
 	  <None Remove="Resources\Icons\hide.png" />
@@ -124,6 +115,7 @@
 	  <MauiImage Include="Resources\Icons\no_data.png" />
 	  <MauiImage Include="Resources\Icons\user.png" />
 	  <MauiImage Include="Resources\Icons\view.png" />
+	  <MauiImage Include="Resources\Images\attendances.png" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -140,13 +132,13 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <MauiXaml Update="AttendanceReportWindow.xaml">
+	  <MauiXaml Update="Pages\AttendanceReportWindow.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="LoginPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="NavigateToClassPage.xaml">
+	  <MauiXaml Update="Pages\NavigateToClassPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	</ItemGroup>
@@ -156,6 +148,7 @@
 	  <Using Include="AttendanceWorksLibrary.DataAccess" />
 	  <Using Include="AttendanceWorksLibrary.Models" />
 	  <Using Include="AttendanceWorksLibrary.Utilities" />
+	  <Using Include="AttendanceWorksMaui.Pages" />
 	</ItemGroup>
 
 </Project>

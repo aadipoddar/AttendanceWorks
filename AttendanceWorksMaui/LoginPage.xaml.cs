@@ -95,7 +95,7 @@ public partial class LoginPage : ContentPage
 			}
 		}
 
-		Mailing.MailPassword(student.Email, student.Password);
+		Mailing.ForgotPasswordEmail(student.Email, student.Password);
 
 		await DisplayAlert("Password Mailed", "Your Password has been mailed to you to your Email Address", "OK");
 	}

@@ -27,7 +27,7 @@ public static class MauiProgram
 											Android =
 											{
 												LaunchAppWhenTapped = true,
-												IconName = { ResourceName = "i2" }
+												IconName = { ResourceName = "attendances" }
 											}
 					}]
 				});

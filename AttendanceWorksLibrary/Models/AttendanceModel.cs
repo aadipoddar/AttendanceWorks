@@ -26,7 +26,6 @@ public class AttendanceDetailModel
 	public DateOnly ClassDate { get; set; }
 	public TimeOnly StartTime { get; set; }
 	public TimeOnly EndTime { get; set; }
-	public int CourseSectionId { get; set; }
 	public int ClassRoomId { get; set; }
 	public string ClassRoomName { get; set; }
 	public int CourseId { get; set; }
@@ -35,14 +34,4 @@ public class AttendanceDetailModel
 	public int CourseCredits { get; set; }
 	public int SectionId { get; set; }
 	public string SectionName { get; set; }
-}
-
-public class StudentAttendanceViewModel
-{
-	public int Id { get; set; }
-	public string Name { get; set; }
-	public int Roll { get; set; }
-	public bool Present { get; set; }
-	public DateTime EntryTime { get; set; }
-	public int AttendanceId { get; set; }
 }

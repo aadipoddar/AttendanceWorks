@@ -8,4 +8,5 @@ BEGIN
 		[dbo].[Student]
 	WHERE
 		[Roll] = @Roll
+		AND [Status] = 1
 END

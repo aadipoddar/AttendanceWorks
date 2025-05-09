@@ -5,7 +5,7 @@ BEGIN
 	SELECT
 	*
 	FROM
-		View_ScheduleedClassDetails
+		[View_ScheduledClassDetails]
 	WHERE
 		SectionId = @SectionId;
 END

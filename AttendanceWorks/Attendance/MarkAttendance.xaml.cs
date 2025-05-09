@@ -10,7 +10,7 @@ public partial class MarkAttendance : Window
 {
 	private TeacherModel _teacher;
 	private readonly ActiveClassModel _activeClass;
-	private List<StudentAttendanceViewModel> _students = [];
+	private readonly List<StudentAttendanceViewModel> _students = [];
 	private List<StudentAttendanceViewModel> _filteredStudents = [];
 
 	public MarkAttendance(ActiveClassModel activeClass)
@@ -27,7 +27,6 @@ public partial class MarkAttendance : Window
 
 	private async Task LoadData()
 	{
-		// Display class information
 		_teacher = await CommonData.LoadTableDataById<TeacherModel>(TableNames.Teacher, _activeClass.TeacherId);
 
 		classInfoTextBlock.Text = $"Current Class: {_activeClass.CourseCode} - {_activeClass.CourseName} ({_activeClass.SectionName})";
@@ -35,10 +34,7 @@ public partial class MarkAttendance : Window
 		teacherNameTextBlock.Text = $"Teacher: {_teacher.Name}";
 		classroomTextBlock.Text = $"Classroom: {_activeClass.ClassroomName}";
 
-		// Get enrolled students for this course section
 		var enrolledStudents = await StudentData.LoadStudentBySection(_activeClass.SectionId);
-
-		// Check if attendance has already been marked for this class
 		var existingAttendance = await AttendanceData.LoadAttendanceByScheduledClass(_activeClass.ScheduledClassId);
 
 		foreach (var student in enrolledStudents)
@@ -83,20 +79,11 @@ public partial class MarkAttendance : Window
 			student.EntryTime = DateTime.Now;
 		}
 
-		// Force refresh of data grid
 		studentsDataGrid.Items.Refresh();
-	}
-
-	private void cancelButton_Click(object sender, RoutedEventArgs e)
-	{
-		if (MessageBox.Show("Are you sure you want to cancel? Any unsaved changes will be lost.",
-				"Confirm Cancel", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
-			Close();
 	}
 
 	private async void saveAttendanceButton_Click(object sender, RoutedEventArgs e)
 	{
-		// Create attendance records
 		foreach (var student in _students)
 		{
 			var attendanceModel = new AttendanceModel
@@ -115,4 +102,14 @@ public partial class MarkAttendance : Window
 		MessageBox.Show("Attendance has been successfully saved!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
 		Close();
 	}
+}
+
+internal class StudentAttendanceViewModel
+{
+	public int Id { get; set; }
+	public string Name { get; set; }
+	public int Roll { get; set; }
+	public bool Present { get; set; }
+	public DateTime EntryTime { get; set; }
+	public int AttendanceId { get; set; }
 }

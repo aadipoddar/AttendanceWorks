@@ -8,6 +8,8 @@ namespace AttendanceWorks.Admin;
 /// </summary>
 public partial class ScheduledClassPage : Page
 {
+	private bool _originalStatus;
+
 	public ScheduledClassPage() =>
 		InitializeComponent();
 
@@ -19,13 +21,31 @@ public partial class ScheduledClassPage : Page
 		var scheduledClass = await CommonData.LoadTableData<ScheduledClassModel>(TableNames.ScheduledClass);
 		scheduledClassDataGrid.ItemsSource = scheduledClass;
 
-		var course = await CommonData.LoadTableData<CourseSectionModel>(TableNames.CourseSection);
-		courseSectionComboBox.ItemsSource = course;
-		courseSectionComboBox.DisplayMemberPath = nameof(CourseSectionModel.Id);
-		courseSectionComboBox.SelectedValuePath = nameof(CourseSectionModel.Id);
-		courseSectionComboBox.SelectedIndex = 0;
-
 		classDatePicker.SelectedDate = DateTime.Now;
+
+		var course = await CommonData.LoadTableData<CourseModel>(TableNames.Course);
+		courseComboBox.ItemsSource = course;
+		courseComboBox.DisplayMemberPath = nameof(CourseModel.Name);
+		courseComboBox.SelectedValuePath = nameof(CourseModel.Id);
+		courseComboBox.SelectedIndex = 0;
+
+		var section = await CommonData.LoadTableData<SectionModel>(TableNames.Section);
+		sectionComboBox.ItemsSource = section;
+		sectionComboBox.DisplayMemberPath = nameof(SectionModel.Name);
+		sectionComboBox.SelectedValuePath = nameof(SectionModel.Id);
+		sectionComboBox.SelectedIndex = 0;
+
+		var teacher = await CommonData.LoadTableData<TeacherModel>(TableNames.Teacher);
+		teacherComboBox.ItemsSource = teacher;
+		teacherComboBox.DisplayMemberPath = nameof(TeacherModel.Name);
+		teacherComboBox.SelectedValuePath = nameof(TeacherModel.Id);
+		teacherComboBox.SelectedIndex = 0;
+
+		var classRoom = await CommonData.LoadTableData<ClassRoomModel>(TableNames.ClassRoom);
+		classRoomComboBox.ItemsSource = classRoom;
+		classRoomComboBox.DisplayMemberPath = nameof(ClassRoomModel.Name);
+		classRoomComboBox.SelectedValuePath = nameof(ClassRoomModel.Id);
+		classRoomComboBox.SelectedIndex = 0;
 	}
 
 	private void integerTextBox_PreviewTextInput(object sender, System.Windows.Input.TextCompositionEventArgs e) =>
@@ -35,11 +55,16 @@ public partial class ScheduledClassPage : Page
 	{
 		if (scheduledClassDataGrid.SelectedItem is ScheduledClassModel scheduledClass)
 		{
-			courseSectionComboBox.SelectedValue = scheduledClass.CourseSectionId;
+			courseComboBox.SelectedValue = scheduledClass.CourseId;
+			sectionComboBox.SelectedValue = scheduledClass.SectionId;
+			teacherComboBox.SelectedValue = scheduledClass.TeacherId;
+			classRoomComboBox.SelectedValue = scheduledClass.ClassRoomId;
 			classDatePicker.SelectedDate = scheduledClass.ClassDate.ToDateTime(new TimeOnly());
-			startTimeTextBox.Text = scheduledClass.StartTime.ToString("hh");
-			endTimeTextBox.Text = scheduledClass.EndTime.ToString("hh");
+			startTimeTextBox.Text = scheduledClass.StartTime.ToString("HH");
+			endTimeTextBox.Text = scheduledClass.EndTime.ToString("HH");
 			statusCheckBox.IsChecked = scheduledClass.Status;
+
+			_originalStatus = scheduledClass.Status;
 		}
 		else
 			ClearForm();
@@ -50,37 +75,100 @@ public partial class ScheduledClassPage : Page
 		if (!ValidateForm())
 			return;
 
+		saveButton.IsEnabled = false;
+
+		bool isNewClass = scheduledClassDataGrid.SelectedItem == null;
+		bool statusChanged = false;
+
+		if (!isNewClass && scheduledClassDataGrid.SelectedItem is ScheduledClassModel)
+			statusChanged = _originalStatus != (statusCheckBox.IsChecked ?? false);
+
+
 		if (scheduledClassDataGrid.SelectedItem is ScheduledClassModel scheduledClass)
 			await AttendanceData.DeleteAttendanceByScheduledClass(scheduledClass.Id);
 
 		int scheduledClassId = await ScheduledClassData.InsertScheduledClass(new ScheduledClassModel
 		{
 			Id = (scheduledClassDataGrid.SelectedItem as ScheduledClassModel)?.Id ?? 0,
-			CourseSectionId = (int)courseSectionComboBox.SelectedValue,
+			CourseId = (int)courseComboBox.SelectedValue,
+			SectionId = (int)sectionComboBox.SelectedValue,
+			TeacherId = (int)teacherComboBox.SelectedValue,
+			ClassRoomId = (int)classRoomComboBox.SelectedValue,
 			ClassDate = DateOnly.FromDateTime(classDatePicker.SelectedDate.Value),
 			StartTime = new TimeOnly(int.Parse(startTimeTextBox.Text), 0),
 			EndTime = new TimeOnly(int.Parse(endTimeTextBox.Text), 0),
 			Status = statusCheckBox.IsChecked ?? false
 		});
 
-		var courseSection = courseSectionComboBox.SelectedItem as CourseSectionModel;
-		var students = await StudentData.LoadStudentBySection(courseSection.SectionId);
+		var students = await StudentData.LoadStudentBySection((int)sectionComboBox.SelectedValue);
 
-		foreach (var student in students)
+		if (isNewClass || (statusChanged && (statusCheckBox.IsChecked ?? false)))
 		{
-			await AttendanceData.InsertAttendance(new AttendanceModel
-			{
-				Id = 0,
-				ScheduledClassId = (scheduledClassDataGrid.SelectedItem as ScheduledClassModel)?.Id ?? scheduledClassId,
-				StudentId = student.Id,
-				Present = false,
-				EntryTime = DateTime.Now,
-				MarkedBy = null
-			});
+			foreach (var student in students)
+				await AttendanceData.InsertAttendance(new AttendanceModel
+				{
+					Id = 0,
+					ScheduledClassId = (scheduledClassDataGrid.SelectedItem as ScheduledClassModel)?.Id ?? scheduledClassId,
+					StudentId = student.Id,
+					Present = false,
+					EntryTime = DateTime.Now,
+					MarkedBy = null
+				});
 		}
+
+		if (isNewClass)
+			await SendMails(students);
+
+		else if (statusChanged)
+			await SendStatusChangeMails(students, statusCheckBox.IsChecked ?? false);
+
+		MessageBox.Show("All Notifications Sent to students and teacher",
+			"Success", MessageBoxButton.OK, MessageBoxImage.Information);
 
 		await LoadData();
 		ClearForm();
+	}
+
+	private async Task SendMails(List<StudentModel> students)
+	{
+		var course = await CommonData.LoadTableDataById<CourseModel>(TableNames.Course, (int)courseComboBox.SelectedValue);
+		var classroom = await CommonData.LoadTableDataById<ClassRoomModel>(TableNames.ClassRoom, (int)classRoomComboBox.SelectedValue);
+		var section = await CommonData.LoadTableDataById<SectionModel>(TableNames.Section, (int)sectionComboBox.SelectedValue);
+		var teacher = await CommonData.LoadTableDataById<TeacherModel>(TableNames.Teacher, (int)teacherComboBox.SelectedValue);
+
+		if (teacher is not null)
+			await Mailing.TeacherClassScheduleEmail(teacher, course, classroom, section,
+				DateOnly.FromDateTime(classDatePicker.SelectedDate.Value),
+				new TimeOnly(int.Parse(startTimeTextBox.Text), 0),
+				new TimeOnly(int.Parse(endTimeTextBox.Text), 0));
+
+		foreach (var student in students)
+			await Mailing.StudentClassScheduleEmail(student, course, classroom,
+				DateOnly.FromDateTime(classDatePicker.SelectedDate.Value),
+				new TimeOnly(int.Parse(startTimeTextBox.Text), 0),
+				new TimeOnly(int.Parse(endTimeTextBox.Text), 0));
+	}
+
+	private async Task SendStatusChangeMails(List<StudentModel> students, bool newStatus)
+	{
+		var course = await CommonData.LoadTableDataById<CourseModel>(TableNames.Course, (int)courseComboBox.SelectedValue);
+		var classroom = await CommonData.LoadTableDataById<ClassRoomModel>(TableNames.ClassRoom, (int)classRoomComboBox.SelectedValue);
+		var section = await CommonData.LoadTableDataById<SectionModel>(TableNames.Section, (int)sectionComboBox.SelectedValue);
+		var teacher = await CommonData.LoadTableDataById<TeacherModel>(TableNames.Teacher, (int)teacherComboBox.SelectedValue);
+
+		if (teacher is not null)
+			await Mailing.TeacherClassStatusChangeEmail(teacher, course, classroom, section,
+				DateOnly.FromDateTime(classDatePicker.SelectedDate.Value),
+				new TimeOnly(int.Parse(startTimeTextBox.Text), 0),
+				new TimeOnly(int.Parse(endTimeTextBox.Text), 0),
+				newStatus);
+
+		foreach (var student in students)
+			await Mailing.ClassStatusChangeEmail(student, course, classroom,
+				DateOnly.FromDateTime(classDatePicker.SelectedDate.Value),
+				new TimeOnly(int.Parse(startTimeTextBox.Text), 0),
+				new TimeOnly(int.Parse(endTimeTextBox.Text), 0),
+				newStatus);
 	}
 
 	private void ClearForm()
@@ -89,16 +177,33 @@ public partial class ScheduledClassPage : Page
 		startTimeTextBox.Clear();
 		endTimeTextBox.Clear();
 		statusCheckBox.IsChecked = true;
+		saveButton.IsEnabled = true;
+		_originalStatus = true;
 	}
 
 	private bool ValidateForm()
 	{
-		if (courseSectionComboBox.SelectedValue == null)
+		if (courseComboBox.SelectedValue is null)
 		{
-			MessageBox.Show("Please select a course section.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+			MessageBox.Show("Please select a course.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
 			return false;
 		}
-		if (classDatePicker.SelectedDate == null)
+		if (sectionComboBox.SelectedValue is null)
+		{
+			MessageBox.Show("Please select a section.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+			return false;
+		}
+		if (teacherComboBox.SelectedValue is null)
+		{
+			MessageBox.Show("Please select a teacher.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+			return false;
+		}
+		if (classRoomComboBox.SelectedValue is null)
+		{
+			MessageBox.Show("Please select a classroom.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+			return false;
+		}
+		if (classDatePicker.SelectedDate is null)
 		{
 			MessageBox.Show("Please select a class date.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
 			return false;

@@ -17,6 +17,7 @@
     <Using Include="AttendanceWorksLibrary.Data" />
     <Using Include="AttendanceWorksLibrary.DataAccess" />
     <Using Include="AttendanceWorksLibrary.Models" />
+    <Using Include="AttendanceWorksLibrary.Utilities" />
   </ItemGroup>
 
 </Project>

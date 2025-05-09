@@ -133,13 +133,6 @@
                     Margin="0,0,10,0"
                     Click="markAllPresentButton_Click"/>
             
-            <Button x:Name="cancelButton" 
-                    Grid.Column="1" 
-                    Content="Cancel" 
-                    Padding="15,8" 
-                    Margin="0,0,10,0"
-                    Click="cancelButton_Click"/>
-            
             <Button x:Name="saveAttendanceButton" 
                     Grid.Column="2" 
                     Content="Save Attendance" 

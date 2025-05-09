@@ -15,7 +15,6 @@ SELECT
 	sc.ClassDate,
 	sc.StartTime,
 	sc.EndTime,
-	sc.CourseSectionId,
 	cr.Id AS ClassRoomId,
 	cr.Name AS ClassRoomName,
 	c.Id AS CourseId,
@@ -29,13 +28,11 @@ FROM
 JOIN
 	ScheduledClass sc ON a.ScheduledClassId = sc.Id
 JOIN
-	CourseSection cs ON sc.CourseSectionId = cs.Id
+	ClassRoom cr ON sc.ClassRoomId = cr.Id
 JOIN
-	ClassRoom cr ON cs.ClassRoomId = cr.Id
+	Course c ON sc.CourseId = c.Id
 JOIN
-	Course c ON cs.CourseId = c.Id
-JOIN
-	Section s ON cs.SectionId = s.Id
+	Section s ON sc.SectionId = s.Id
 JOIN
 	Student st ON a.StudentID = st.Id
 LEFT JOIN

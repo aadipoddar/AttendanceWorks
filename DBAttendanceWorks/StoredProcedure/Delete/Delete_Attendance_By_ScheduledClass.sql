@@ -2,5 +2,9 @@
 	@ScheduledClassId INT
 AS
 BEGIN
-	DELETE FROM dbo.Attendance WHERE ScheduledClassId = @ScheduledClassId;
+	DELETE
+	FROM
+		dbo.Attendance
+	WHERE
+		ScheduledClassId = @ScheduledClassId;
 END

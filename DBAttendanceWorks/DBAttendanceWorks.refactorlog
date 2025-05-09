@@ -14,4 +14,11 @@
     <Property Name="ParentElementType" Value="SqlSchema" />
     <Property Name="NewName" Value="[Insert_SectionStudent]" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="26ebba75-77fe-448a-bce0-4ad12e695fa0" ChangeDateTime="05/09/2025 08:07:08">
+    <Property Name="ElementName" Value="[dbo].[View_ScheduleedClassDetails]" />
+    <Property Name="ElementType" Value="SqlView" />
+    <Property Name="ParentElementName" Value="[dbo]" />
+    <Property Name="ParentElementType" Value="SqlSchema" />
+    <Property Name="NewName" Value="[View_ScheduledClassDetails]" />
+  </Operation>
 </Operations>

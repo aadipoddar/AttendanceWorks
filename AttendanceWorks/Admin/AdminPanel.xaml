@@ -25,18 +25,14 @@
 					<RowDefinition Height="Auto"/>
 					<RowDefinition Height="Auto"/>
 					<RowDefinition Height="Auto"/>
-					<RowDefinition Height="Auto"/>
-					<RowDefinition Height="Auto"/>
 				</Grid.RowDefinitions>
 
-				<!-- Buttons set to stretch horizontally -->
 				<Button Content="Students" Grid.Row="0" Margin="10" Padding="5" MinWidth="120" MinHeight="40" HorizontalAlignment="Stretch" Click="studentsButton_Click" />
 				<Button Content="Teachers" Grid.Row="1" Margin="10" Padding="5" MinWidth="120" MinHeight="40" HorizontalAlignment="Stretch" Click="teacherButton_Click" />
 				<Button Content="Class Room" Grid.Row="2" Margin="10" Padding="5" MinWidth="120" MinHeight="40" HorizontalAlignment="Stretch" Click="classRoomButton_Click" />
 				<Button Content="Course" Grid.Row="3" Margin="10" Padding="5" MinWidth="120" MinHeight="40" HorizontalAlignment="Stretch" Click="courseButton_Click" />
 				<Button Content="Section" Grid.Row="4" Margin="10" Padding="5" MinWidth="120" MinHeight="40" HorizontalAlignment="Stretch" Click="sectionButton_Click" />
-				<Button Content="Course Section" Grid.Row="5" Margin="10" Padding="5" MinWidth="120" MinHeight="40" HorizontalAlignment="Stretch" Click="courseSectionButton_Click" />
-				<Button Content="Scheduled Class" Grid.Row="7" Margin="10" Padding="5" MinWidth="120" MinHeight="40" HorizontalAlignment="Stretch" Click="scheduledClassButton_Click" />
+				<Button Content="Scheduled Class" Grid.Row="5" Margin="10" Padding="5" MinWidth="120" MinHeight="40" HorizontalAlignment="Stretch" Click="scheduledClassButton_Click" />
 			</Grid>
 		</ScrollViewer>
 

@@ -1,4 +1,4 @@
-﻿CREATE VIEW [dbo].[View_ScheduleedClassDetails]
+﻿CREATE VIEW [dbo].[View_ScheduledClassDetails]
 	AS
 SELECT
 	sc.[Id],
@@ -17,16 +17,13 @@ SELECT
 FROM
 	ScheduledClass sc
 JOIN
-	CourseSection cs ON sc.[CourseSectionId] = cs.[Id]
+	Course c ON sc.[CourseId] = c.[Id]
 JOIN
-	Course c ON cs.[CourseId] = c.[Id]
+	Section s ON sc.[SectionId] = s.[Id]
 JOIN
-	Section s ON cs.[SectionId] = s.[Id]
+	Teacher t ON sc.[TeacherId] = t.[Id]
 JOIN
-	Teacher t ON cs.[TeacherId] = t.[Id]
-JOIN
-	ClassRoom cr ON cs.[ClassRoomId] = cr.[Id]
+	ClassRoom cr ON sc.[ClassRoomId] = cr.[Id]
 WHERE sc.[Status] = 1
-	AND cs.[Status] = 1
 	AND c.[Status] = 1
 	AND s.[Status] = 1	

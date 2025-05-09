@@ -16,11 +16,10 @@ SELECT
     sc.[EndTime]
 FROM 
     [dbo].[ScheduledClass] sc
-    INNER JOIN [dbo].[CourseSection] cs ON sc.[CourseSectionId] = cs.[Id]
-    INNER JOIN [dbo].[Course] c ON cs.[CourseId] = c.[Id]
-    INNER JOIN [dbo].[Section] s ON cs.[SectionId] = s.[Id]
-    INNER JOIN [dbo].[Teacher] t ON cs.[TeacherId] = t.[Id]
-    INNER JOIN [dbo].[ClassRoom] cr ON cs.[ClassRoomId] = cr.[Id]
+    INNER JOIN [dbo].[Course] c ON sc.[CourseId] = c.[Id]
+    INNER JOIN [dbo].[Section] s ON sc.[SectionId] = s.[Id]
+    INNER JOIN [dbo].[Teacher] t ON sc.[TeacherId] = t.[Id]
+    INNER JOIN [dbo].[ClassRoom] cr ON sc.[ClassRoomId] = cr.[Id]
 WHERE 
     sc.[ClassDate] = CAST(DATEADD(MINUTE, 330, GETUTCDATE()) AS DATE)
     AND sc.[StartTime] <= CAST(DATEADD(MINUTE, 330, GETUTCDATE()) AS TIME)
@@ -29,6 +28,5 @@ WHERE
     --AND sc.[StartTime] <= CAST(GETDATE() AS TIME)
     --AND sc.[EndTime] > CAST(GETDATE() AS TIME)
     AND sc.[Status] = 1
-    AND cs.[Status] = 1
     AND c.[Status] = 1
     AND s.[Status] = 1

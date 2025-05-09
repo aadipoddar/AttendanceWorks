@@ -81,14 +81,12 @@
     <Build Include="StoredProcedure\LoadData\Teacher\Load_Teacher_By_Email_Password.sql" />
     <Build Include="Tables\Section.sql" />
     <Build Include="Tables\Course.sql" />
-    <Build Include="Tables\CourseSection.sql" />
     <Build Include="Tables\ScheduledClass.sql" />
     <Build Include="Tables\Attendance.sql" />
     <Build Include="StoredProcedure\Insert\Insert_Student.sql" />
     <Build Include="StoredProcedure\Insert\Insert_Teacher.sql" />
     <Build Include="StoredProcedure\Insert\Insert_ClassRoom.sql" />
     <Build Include="StoredProcedure\Insert\Insert_Course.sql" />
-    <Build Include="StoredProcedure\Insert\Insert_CourseSection.sql" />
     <Build Include="StoredProcedure\Insert\Insert_Section.sql" />
     <Build Include="StoredProcedure\Insert\Insert_ScheduledClass.sql" />
     <Build Include="StoredProcedure\Insert\Insert_Attendance.sql" />
@@ -99,7 +97,7 @@
     <Build Include="StoredProcedure\LoadData\Student\Load_Student_Attendance.sql" />
     <Build Include="Views\View_AttendanceDetails.sql" />
     <Build Include="StoredProcedure\Delete\Delete_Attendance_By_ScheduledClass.sql" />
-    <Build Include="Views\View_ScheduleedClassDetails.sql" />
+    <Build Include="Views\View_ScheduledClassDetails.sql" />
     <Build Include="StoredProcedure\LoadData\Classes\Load_ScheduledClasseDetails_By_Section.sql" />
   </ItemGroup>
   <ItemGroup>

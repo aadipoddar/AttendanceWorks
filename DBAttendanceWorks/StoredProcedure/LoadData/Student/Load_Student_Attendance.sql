@@ -5,7 +5,7 @@ BEGIN
 	SELECT
 	*
 	FROM 
-		View_AttendanceDetails a
+		View_AttendanceDetails
 	WHERE 
-		a.StudentId = @StudentID
+		StudentId = @StudentID
 END

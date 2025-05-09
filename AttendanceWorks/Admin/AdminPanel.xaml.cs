@@ -29,9 +29,6 @@ public partial class AdminPanel : Window
 	private void sectionButton_Click(object sender, RoutedEventArgs e) =>
 		mainFrame.Content = new SectionPage();
 
-	private void courseSectionButton_Click(object sender, RoutedEventArgs e) =>
-		mainFrame.Content = new CourseSectionPage();
-
 	private void scheduledClassButton_Click(object sender, RoutedEventArgs e) =>
 		mainFrame.Content = new ScheduledClassPage();
 }
