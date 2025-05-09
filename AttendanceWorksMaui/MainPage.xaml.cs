@@ -354,16 +354,12 @@ public partial class MainPage : ContentPage
 	private async void Current_NotificationActionTapped(NotificationActionEventArgs e)
 	{
 		if (e.ActionId == 100)
-		{
 			if (int.TryParse(e.Request.ReturningData, out int classroomId))
 			{
 				var classRoom = await CommonData.LoadTableDataById<ClassRoomModel>(TableNames.ClassRoom, classroomId);
 				if (classRoom is not null)
-				{
 					await Navigation.PushAsync(new NavigateToClassPage(classRoom));
-				}
 			}
-		}
 	}
 
 	private async Task CreateClassNotifications()
@@ -380,9 +376,9 @@ public partial class MainPage : ContentPage
 		}
 
 		var classes = await ScheduledClassData.LoadScheduledClasseDetailsBySection(_student.SectionId);
-		var fiveDaysFromNow = DateOnly.FromDateTime(DateTime.Today.AddDays(5));
+		var twoDaysFromNow = DateOnly.FromDateTime(DateTime.Today.AddDays(2));
 		classes = [.. classes.Where(c =>
-			(c.ClassDate >= DateOnly.FromDateTime(DateTime.Today) && c.ClassDate <= fiveDaysFromNow) ||
+			(c.ClassDate >= DateOnly.FromDateTime(DateTime.Today) && c.ClassDate <= twoDaysFromNow) ||
 			(c.ClassDate == DateOnly.FromDateTime(DateTime.Today) &&
 			 c.StartTime > TimeOnly.FromTimeSpan(DateTime.Now.TimeOfDay)))];
 
