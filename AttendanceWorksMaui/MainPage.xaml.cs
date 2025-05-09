@@ -23,24 +23,22 @@ public partial class MainPage : ContentPage
 		LocalNotificationCenter.Current.NotificationActionTapped += Current_NotificationActionTapped;
 	}
 
+	#region LoadData
 	private async void ContentPage_Loaded(object sender, EventArgs e)
+	{
+		await LoadClassInfo();
+		await CheckLocationPermission();
+		await LoadAttendanceStats();
+		await CreateClassNotifications();
+	}
+
+	private async void MainRefreshView_Refreshing(object sender, EventArgs e)
 	{
 		await LoadClassInfo();
 		await LoadAttendanceStats();
 		await CheckLocationPermission();
-		await CreateClassNotifications();
-	}
 
-	private async void RefreshButton_Clicked(object sender, EventArgs e)
-	{
-		RefreshButton.IsEnabled = false;
-		RefreshButton.Text = "Refreshing...";
-
-		await LoadClassInfo();
-		await CheckLocationPermission();
-
-		RefreshButton.IsEnabled = true;
-		RefreshButton.Text = "Refresh Class Info";
+		MainRefreshView.IsRefreshing = false;
 	}
 
 	private async Task LoadClassInfo()
@@ -101,6 +99,7 @@ public partial class MainPage : ContentPage
 	private async Task LoadAttendanceStats()
 	{
 		var studentAttendance = await StudentData.LoadStudentAttendance(_student.Id);
+		studentAttendance = [.. studentAttendance.Where(x => x.ClassDate <= DateOnly.FromDateTime(DateTime.Now))];
 		if (studentAttendance is not null)
 		{
 			var presentPercentage = (double)studentAttendance.Count(a => a.Present) / studentAttendance.Count * 100;
@@ -110,12 +109,24 @@ public partial class MainPage : ContentPage
 				(a.EntryTime.TimeOfDay - a.StartTime.ToTimeSpan()).TotalMinutes > 5);
 			var latePercentage = (double)lateCount / studentAttendance.Count * 100;
 
-			presentPercentLabel.Text = $"{presentPercentage:F2}%";
-			absentPercentLabel.Text = $"{absentPercentage:F2}%";
-			latePercentLabel.Text = $"{latePercentage:F2}%";
+			presentPercentLabel.Text = $"{presentPercentage:F1}%";
+			absentPercentLabel.Text = $"{absentPercentage:F1}%";
+			latePercentLabel.Text = $"{latePercentage:F1}%";
 		}
 	}
 
+	protected override void OnDisappearing()
+	{
+		if (_isCheckingLocation)
+			_cancelTokenSource?.Cancel();
+
+		LocalNotificationCenter.Current.NotificationActionTapped -= Current_NotificationActionTapped;
+
+		base.OnDisappearing();
+	}
+	#endregion
+
+	#region Location
 	private async Task CheckLocationPermission()
 	{
 		try
@@ -241,7 +252,9 @@ public partial class MainPage : ContentPage
 			_isCheckingLocation = false;
 		}
 	}
+	#endregion
 
+	#region Attendance
 	private async Task MarkAttendance()
 	{
 		if (_currentClass is null || !_locationPermissionGranted || !_isInClassRange)
@@ -318,7 +331,9 @@ public partial class MainPage : ContentPage
 
 		return false;
 	}
+	#endregion
 
+	#region Buttons
 	private async void NavigateToClassButton_Clicked(object sender, EventArgs e)
 	{
 		var classRoom = await CommonData.LoadTableDataById<ClassRoomModel>(TableNames.ClassRoom, _currentClass.ClassroomId);
@@ -336,32 +351,11 @@ public partial class MainPage : ContentPage
 		await Navigation.PopAsync();
 	}
 
-	private void ViewScheduleButton_Clicked(object sender, EventArgs e)
-	{
+	private async void ViewScheduleButton_Clicked(object sender, EventArgs e) =>
+		await Navigation.PushAsync(new ClassSchedulePage(_student));
+	#endregion
 
-	}
-
-	protected override void OnDisappearing()
-	{
-		if (_isCheckingLocation)
-			_cancelTokenSource?.Cancel();
-
-		LocalNotificationCenter.Current.NotificationActionTapped -= Current_NotificationActionTapped;
-
-		base.OnDisappearing();
-	}
-
-	private async void Current_NotificationActionTapped(NotificationActionEventArgs e)
-	{
-		if (e.ActionId == 100)
-			if (int.TryParse(e.Request.ReturningData, out int classroomId))
-			{
-				var classRoom = await CommonData.LoadTableDataById<ClassRoomModel>(TableNames.ClassRoom, classroomId);
-				if (classRoom is not null)
-					await Navigation.PushAsync(new NavigateToClassPage(classRoom));
-			}
-	}
-
+	#region Notifications
 	private async Task CreateClassNotifications()
 	{
 		var status = await Permissions.CheckStatusAsync<Permissions.PostNotifications>();
@@ -428,4 +422,16 @@ public partial class MainPage : ContentPage
 			await LocalNotificationCenter.Current.Show(startNotification);
 		}
 	}
+
+	private async void Current_NotificationActionTapped(NotificationActionEventArgs e)
+	{
+		if (e.ActionId == 100)
+			if (int.TryParse(e.Request.ReturningData, out int classroomId))
+			{
+				var classRoom = await CommonData.LoadTableDataById<ClassRoomModel>(TableNames.ClassRoom, classroomId);
+				if (classRoom is not null)
+					await Navigation.PushAsync(new NavigateToClassPage(classRoom));
+			}
+	}
+	#endregion
 }

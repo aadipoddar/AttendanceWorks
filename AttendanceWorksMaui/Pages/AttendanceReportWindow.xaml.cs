@@ -22,12 +22,11 @@ public partial class AttendanceReportWindow : ContentPage
 	{
 		var section = await CommonData.LoadTableDataById<SectionModel>(TableNames.Section, _student.SectionId);
 
-		HeaderLabel.Text = "Attendance Report";
 		StudentNameLabel.Text = $"{_student.Name} (Roll: {_student.Roll})";
 		SectionLabel.Text = $"Section: {section?.Name ?? "Unknown"}";
 
 		_attendanceDetails = await StudentData.LoadStudentAttendance(_student.Id);
-		_attendanceDetails = [.. _attendanceDetails.Where(x => x.ClassDate >= DateOnly.FromDateTime(DateTime.Now))];
+		_attendanceDetails = [.. _attendanceDetails.Where(x => x.ClassDate <= DateOnly.FromDateTime(DateTime.Now))];
 
 		if (_attendanceDetails is null || _attendanceDetails.Count == 0)
 		{
