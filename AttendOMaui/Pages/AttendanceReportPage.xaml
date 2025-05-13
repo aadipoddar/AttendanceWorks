@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="AttendOMaui.Pages.AttendanceReportPage"
+             Loaded="AttendanceReportWindow_Loaded"
+             BackgroundColor="{AppThemeBinding Light=White, Dark=#1A1A1A}"
+             Title="Attendance Report">
+
+	<Grid RowDefinitions="Auto,*,Auto" Padding="20,10">
+		<!-- Header Section -->
+		<VerticalStackLayout Grid.Row="0" Spacing="5" Margin="0,0,0,15">
+			<Label x:Name="HeaderLabel" Text="Attendance Report" 
+                   FontSize="24" HorizontalTextAlignment="Center"
+                   FontAttributes="Bold" TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}"/>
+			<Label x:Name="StudentNameLabel" Text="Student Name" 
+                   FontSize="18" HorizontalTextAlignment="Center"/>
+			<Label x:Name="SectionLabel" Text="Section: " 
+                   FontSize="16" HorizontalTextAlignment="Center"/>
+			<BoxView HeightRequest="2" 
+                     Color="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}" 
+                     HorizontalOptions="Fill" Margin="0,5,0,5"/>
+		</VerticalStackLayout>
+
+		<!-- Content Area -->
+		<ScrollView Grid.Row="1">
+			<VerticalStackLayout Spacing="20">
+				<!-- Overall Attendance Summary Card -->
+				<Border StrokeThickness="1" 
+                        Stroke="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}"
+                        StrokeShape="RoundRectangle 10"
+                        Padding="15" 
+                        Background="{AppThemeBinding Light=White, Dark=#252525}">
+					<VerticalStackLayout Spacing="10">
+						<Label Text="Overall Attendance Summary" 
+                               FontSize="20" FontAttributes="Bold" 
+                               TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}" 
+                               HorizontalTextAlignment="Center"/>
+
+						<Grid ColumnDefinitions="*,*,*" RowDefinitions="Auto,Auto">
+							<!-- Present Stats -->
+							<VerticalStackLayout Grid.Column="0" Grid.Row="0" HorizontalOptions="Center">
+								<Border StrokeShape="RoundRectangle 10" 
+                                        BackgroundColor="{AppThemeBinding Light=#dcf8c6, Dark=#1B5E20}" 
+                                        Stroke="{AppThemeBinding Light=#4CAF50, Dark=#388E3C}" 
+                                        StrokeThickness="2"
+                                        WidthRequest="80" HeightRequest="80">
+									<Label x:Name="OverallPresentPercentLabel" Text="0%" 
+                                           VerticalOptions="Center" HorizontalOptions="Center"
+                                           FontSize="18" FontAttributes="Bold" 
+                                           TextColor="{AppThemeBinding Light=#2E7D32, Dark=#A5D6A7}"/>
+								</Border>
+								<Label Text="Present" HorizontalTextAlignment="Center" 
+                                       Margin="0,5,0,0" FontAttributes="Bold"/>
+							</VerticalStackLayout>
+
+							<!-- Absent Stats -->
+							<VerticalStackLayout Grid.Column="1" Grid.Row="0" HorizontalOptions="Center">
+								<Border StrokeShape="RoundRectangle 10" 
+                                        BackgroundColor="{AppThemeBinding Light=#ffcdd2, Dark=#B71C1C}" 
+                                        Stroke="{AppThemeBinding Light=#F44336, Dark=#E53935}" 
+                                        StrokeThickness="2"
+                                        WidthRequest="80" HeightRequest="80">
+									<Label x:Name="OverallAbsentPercentLabel" Text="0%" 
+                                           VerticalOptions="Center" HorizontalOptions="Center"
+                                           FontSize="18" FontAttributes="Bold" 
+                                           TextColor="{AppThemeBinding Light=#c62828, Dark=#FFCDD2}"/>
+								</Border>
+								<Label Text="Absent" HorizontalTextAlignment="Center" 
+                                       Margin="0,5,0,0" FontAttributes="Bold"/>
+							</VerticalStackLayout>
+
+							<!-- Late Stats -->
+							<VerticalStackLayout Grid.Column="2" Grid.Row="0" HorizontalOptions="Center">
+								<Border StrokeShape="RoundRectangle 10" 
+                                        BackgroundColor="{AppThemeBinding Light=#fff9c4, Dark=#F57F17}" 
+                                        Stroke="{AppThemeBinding Light=#FFC107, Dark=#FFA000}" 
+                                        StrokeThickness="2"
+                                        WidthRequest="80" HeightRequest="80">
+									<Label x:Name="OverallLatePercentLabel" Text="0%" 
+                                           VerticalOptions="Center" HorizontalOptions="Center"
+                                           FontSize="18" FontAttributes="Bold" 
+                                           TextColor="{AppThemeBinding Light=#F57F17, Dark=#FFF9C4}"/>
+								</Border>
+								<Label Text="Late" HorizontalTextAlignment="Center" 
+                                       Margin="0,5,0,0" FontAttributes="Bold"/>
+							</VerticalStackLayout>
+
+							<!-- Numeric stats row -->
+							<Label x:Name="OverallPresentCountLabel" Text="0/0 Classes"
+                                   Grid.Column="0" Grid.Row="1" HorizontalTextAlignment="Center"/>
+							<Label x:Name="OverallAbsentCountLabel" Text="0/0 Classes" 
+                                   Grid.Column="1" Grid.Row="1" HorizontalTextAlignment="Center"/>
+							<Label x:Name="OverallLateCountLabel" Text="0/0 Classes" 
+                                   Grid.Column="2" Grid.Row="1" HorizontalTextAlignment="Center"/>
+						</Grid>
+					</VerticalStackLayout>
+				</Border>
+
+				<!-- Course-wise Attendance -->
+				<Label Text="Course-wise Attendance" 
+                       FontSize="20" FontAttributes="Bold" 
+                       TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}" 
+                       HorizontalTextAlignment="Center"/>
+
+				<CollectionView x:Name="CoursesCollectionView" 
+                                SelectionMode="None" 
+                                EmptyView="No attendance records found.">
+					<CollectionView.ItemTemplate>
+						<DataTemplate>
+							<Border StrokeThickness="1" 
+                                    Stroke="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}"
+                                    StrokeShape="RoundRectangle 10"
+                                    Padding="15" Margin="0,0,0,15" 
+                                    Background="{AppThemeBinding Light=White, Dark=#252525}">
+								<Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="*,Auto">
+									<!-- Course Name and Code -->
+									<VerticalStackLayout Grid.Row="0" Grid.Column="0">
+										<Label Text="{Binding CourseName}" 
+                                               FontSize="18" FontAttributes="Bold"/>
+										<Label Text="{Binding CourseCode}" 
+                                               FontSize="14" 
+                                               TextColor="{AppThemeBinding Light=Gray, Dark=#AAAAAA}"/>
+									</VerticalStackLayout>
+
+									<!-- Percentage -->
+									<Border Grid.Row="0" Grid.Column="1" Grid.RowSpan="2"
+                                            StrokeShape="RoundRectangle 15" 
+                                            BackgroundColor="{Binding StatusColor}" 
+                                            Stroke="{Binding BorderColor}" 
+                                            StrokeThickness="2"
+                                            WidthRequest="70" HeightRequest="70">
+										<Label Text="{Binding PresentPercentage, StringFormat='{0:F1}%'}" 
+                                               TextColor="{Binding TextColor}"
+                                               VerticalOptions="Center" 
+                                               HorizontalOptions="Center"
+                                               FontSize="16" FontAttributes="Bold"/>
+									</Border>
+
+									<!-- Statistics -->
+									<Grid Grid.Row="1" Grid.Column="0" 
+                                          ColumnDefinitions="*,*,*" Margin="0,10,0,0">
+										<VerticalStackLayout Grid.Column="0">
+											<Label Text="{Binding PresentCount, StringFormat='Present: {0}'}" 
+                                                   TextColor="{AppThemeBinding Light=#2E7D32, Dark=#4CAF50}" 
+                                                   FontAttributes="Bold"/>
+											<Label Text="{Binding PresentPercentage, StringFormat='{0:F1}%'}" 
+                                                   FontSize="14"/>
+										</VerticalStackLayout>
+										<VerticalStackLayout Grid.Column="1">
+											<Label Text="{Binding AbsentCount, StringFormat='Absent: {0}'}" 
+                                                   TextColor="{AppThemeBinding Light=#c62828, Dark=#F44336}" 
+                                                   FontAttributes="Bold"/>
+											<Label Text="{Binding AbsentPercentage, StringFormat='{0:F1}%'}" 
+                                                   FontSize="14"/>
+										</VerticalStackLayout>
+										<VerticalStackLayout Grid.Column="2">
+											<Label Text="{Binding LateCount, StringFormat='Late: {0}'}" 
+                                                   TextColor="{AppThemeBinding Light=#F57F17, Dark=#FFC107}" 
+                                                   FontAttributes="Bold"/>
+											<Label Text="{Binding LatePercentage, StringFormat='{0:F1}%'}" 
+                                                   FontSize="14"/>
+										</VerticalStackLayout>
+									</Grid>
+
+									<!-- Total Classes -->
+									<Label Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
+                                           Text="{Binding TotalClasses, StringFormat='Total Classes: {0}'}" 
+                                           TextColor="{AppThemeBinding Light=#555555, Dark=#AAAAAA}"
+                                           Margin="0,10,0,0"/>
+								</Grid>
+							</Border>
+						</DataTemplate>
+					</CollectionView.ItemTemplate>
+				</CollectionView>
+			</VerticalStackLayout>
+		</ScrollView>
+
+		<Button Grid.Row="2" Text="Back to Dashboard" 
+                HorizontalOptions="Center" Margin="0,15,0,10"
+                Clicked="BackButton_Clicked"/>
+	</Grid>
+</ContentPage>

@@ -398,5 +398,4 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
-AttendanceWorksLibrary/DataAccess/Secrets.cs
-AttendanceWorksMaui/Platforms/Android/AndroidManifest.xml
+/AttendOLibrary/DataAccess/Secrets.cs
